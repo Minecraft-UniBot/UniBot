@@ -1,0 +1,119 @@
+from nonebot.log import logger
+from nonebot_plugin_alconna import on_alconna, Match
+from arclet.alconna import Alconna, Args
+
+from Scripts.Config import config
+from Scripts.Globals import render_template
+from Scripts.Managers import server_manager
+from Scripts.Network import get_player_uuid
+from Scripts.Utils import turn_message_text
+
+logger.debug('加载命令 List 完毕！')
+
+matcher = on_alconna(
+    Alconna("list", Args["server?", str]),
+    use_cmd_start=True,
+)
+
+
+@matcher.handle()
+async def handle(server: Match[str]):
+    server_flag = server.result if server.available else None
+    flag, response = await get_players(server_flag)
+    if flag is False:
+        await matcher.finish(response)
+    if config.image_mode:
+        player_uuids = {}
+        for players in response.values():
+            for player in players[0]:
+                player_uuids[player] = await get_player_uuid(player)
+        image = await render_template('List.html', (700, 1000), player_list=response, uuids=player_uuids)
+        await matcher.finish(image)
+    message = await turn_message_text(list_handler(response))
+    await matcher.finish(message)
+
+
+async def get_player_list(bot):
+    """通过 RCON 命令获取玩家列表"""
+    try:
+        result = await bot.send_rcon_command('list')
+    except Exception:
+        return None
+    if not result:
+        return None
+    # 解析 "There are X of max Y players online: player1, player2, ..."
+    if ':' in result:
+        players_str = result.split(':')[1].strip()
+        if players_str:
+            return [p.strip() for p in players_str.split(',')]
+    return []
+
+
+def classify_players(players: list):
+    if not config.bot_prefix:
+        return (players,)
+    fake_players, real_players = [], []
+    for player in players:
+        if player.upper().startswith(config.bot_prefix):
+            fake_players.append(player)
+        else:
+            real_players.append(player)
+    return real_players, fake_players
+
+
+async def get_players(server_flag: str = None):
+    if server_flag:
+        bot = server_manager.get_server(server_flag)
+        if bot is None:
+            return False, f'没有找到已连接的 [{server_flag}] 服务器！请检查编号或名称是否输入正确。'
+        players = await get_player_list(bot)
+        return True, {bot.self_id: classify_players(players) if players else ([],)}
+    players = {}
+    for name, bot in server_manager.servers.items():
+        result = await get_player_list(bot)
+        players[name] = classify_players(result) if result is not None else ([],)
+    if not players:
+        return False, '当前没有已连接的服务器！'
+    return True, players
+
+
+def list_handler(players: dict):
+    if len(players) == 1:
+        server_name, players_data = players.popitem()
+        online_count = sum(len(p) for p in players_data)
+        yield f'===== {server_name} 玩家列表 ====='
+        yield from format_players(players_data)
+        yield f'当前在线人数共 {online_count} 人'
+        return
+    player_count = 0
+    if players:
+        yield '====== 玩家列表 ======'
+        for name, value in players.items():
+            if value is None:
+                continue
+            player_count += sum(len(p) for p in value)
+            yield f' -------- {name} --------'
+            yield from format_players(value)
+        yield f'当前在线人数共 {player_count} 人'
+        return
+    yield '当前没有已连接的服务器！'
+
+
+def format_players(players: list):
+    if config.bot_prefix and len(players) > 1:
+        real_players, fake_players = players
+        real_players_str = '\n    '.join(real_players)
+        fake_players_str = '\n    '.join(fake_players)
+        yield '  ———— 玩家 ————'
+        if not real_players_str:
+            real_players_str = '没有玩家在线！'
+        yield '    ' + real_players_str
+        yield '  ———— 假人 ————'
+        if not fake_players_str:
+            fake_players_str = '没有假人在线！'
+        yield '    ' + fake_players_str + '\n'
+        return
+    if grouped := players[0]:
+        yield '    ' + '\n    '.join(grouped) + '\n'
+        return
+    yield '  没有玩家在线！\n'
