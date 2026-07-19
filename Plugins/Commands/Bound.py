@@ -9,6 +9,7 @@ from Scripts.Utils import check_player, get_permission
 from Scripts.Rules import command_group_rule
 
 logger.debug('加载命令 Bound 完毕！')
+
 matcher = (
     Command('bound <player?:str>')
     .subcommand('list')

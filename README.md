@@ -37,6 +37,88 @@
 
 ---
 
+## 📖 使用方法
+
+### 前置要求
+
+- Python 3.10 ~ 3.12
+- [UV](https://docs.astral.sh/uv/)（推荐，快速包管理器）或 pip
+- Minecraft Java 服务端（需安装 [鹊桥插件](https://github.com/17TheWord/MC_QQ_Spigot)）
+- 一个 QQ 机器人账号（或其他平台账号）
+
+### 🚀 快速安装与启动
+
+#### 方式一：使用 UV（推荐）
+
+```bash
+# 克隆项目
+git clone https://github.com/Minecraft-QQBot/BotServer
+cd BotServer
+
+# 创建虚拟环境并安装依赖（UV 自动管理）
+uv sync
+
+# 复制环境配置模板
+cp .env.example .env
+
+# 编辑 .env 配置文件（按需修改）
+# vim .env
+
+# 启动机器人
+uv run nb run
+```
+
+> **为什么推荐 UV？** UV 比 pip 快 10-100 倍，自动解析依赖冲突，支持锁定文件（`uv.lock`）确保环境一致，一条命令即可完成虚拟环境创建与依赖安装。
+
+#### 方式二：使用 pip + venv（传统方式）
+
+```bash
+git clone https://github.com/Minecraft-QQBot/BotServer
+cd BotServer
+
+# 创建虚拟环境
+python3 -m venv .venv
+source .venv/bin/activate
+
+# 安装依赖
+pip install -e .
+
+# 配置环境
+cp .env.example .env
+# vim .env
+
+# 启动
+nb run
+```
+
+### ⚙️ 配置说明
+
+创建 `.env` 文件后，至少需要配置以下关键项：
+
+```ini
+# 管理员 QQ 号列表
+SUPERUSERS=["123456789"]
+
+# 推送消息的群组（支持多群）
+MESSAGE_GROUPS=["qq:123456789"]
+
+# Minecraft 服务器 WebSocket 地址（支持多服）
+MINECRAFT_WS_URLS={"server1": ["ws://你的IP:端口/路径"]}
+```
+
+> 📖 完整配置项说明请参阅 `.env` 文件内注释。
+
+### 🐳 Docker 部署
+
+```bash
+git clone https://github.com/Minecraft-QQBot/BotServer
+cd BotServer
+# 编辑 .env 配置文件
+docker compose up -d
+```
+
+---
+
 ## 🎯 功能一览
 
 ### 群服互通

@@ -15,10 +15,11 @@ from nonebot_plugin_alconna.uniseg import UniMsg
 from Scripts.Config import config
 from Scripts.Managers import server_manager
 from Scripts.Utils import check_message
+from Scripts.Rules import message_group_rule
 
 
 notice_watcher = on_notice()
-message_watcher = on_message()
+message_watcher = on_message(rule=message_group_rule)
 
 
 scope_mapping = {
