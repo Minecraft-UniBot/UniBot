@@ -7,12 +7,14 @@ from nonebot_plugin_uninfo import Uninfo, SupportScope
 
 
 def is_message_group(session: Uninfo):
-    group_info = SupportScope(session.scope)
+    scope = SupportScope(session.scope)
+    group_info = f'{scope.name}:{session.id}'
     return group_info in config.message_groups
 
 
 def is_command_group(session: Uninfo):
-    group_info = SupportScope(session.scope)
+    scope = SupportScope(session.scope)
+    group_info = f'{scope.name}:{session.scene.id}'
     return group_info in config.command_groups
 
 

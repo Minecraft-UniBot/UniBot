@@ -1,11 +1,11 @@
 from nonebot.log import logger
-from nonebot_plugin_uninfo import Uninfo, ADMIN
+from nonebot_plugin_uninfo import Uninfo
 from nonebot_plugin_alconna import Command, Match
 
 from Scripts.Config import config
 from Scripts.Managers import server_manager
-from Scripts.Utils import turn_message_text
 from Scripts.Rules import command_group_rule
+from Scripts.Utils import turn_message_text, get_permission
 
 logger.debug('加载命令 Command 完毕！')
 
@@ -15,7 +15,7 @@ matcher = Command('command <server:str> <command:str+>').build(rule=command_grou
 
 @matcher.handle()
 async def handle(session: Uninfo, server: Match[str], command: Match[list[str]]):
-    if (not session.member) or session.member.role not in ['ADMINISTRATOR', 'OWNER']:
+    if not get_permission(session):
         await matcher.finish('缺少必要的管理员权限！')
     if not command.available:
         await matcher.finish('参数不正确！请查看语法后再试。')

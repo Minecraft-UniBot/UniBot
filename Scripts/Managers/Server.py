@@ -36,13 +36,13 @@ class ServerManager:
         if server_flag is not None:
             bot = self.get_server(server_flag)
             if bot is not None:
-                return {bot.self_id: await bot.send_rcon_command(command)}
+                return {bot.self_id: await bot.send_rcon_command(command=command)}
             return None
 
         results = {}
         for name, bot in self.servers.items():
             try:
-                results[name] = await bot.send_rcon_command(command)
+                results[name] = await bot.send_rcon_command(command=command)
             except Exception as e:
                 logger.warning(f'向服务器 [{name}] 发送指令失败：{e}')
                 results[name] = None

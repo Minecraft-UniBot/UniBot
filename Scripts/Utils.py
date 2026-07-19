@@ -31,5 +31,5 @@ def get_permission(session) -> bool:
     if uid in config.superusers:
         return True
     if config.admin_superusers and session.member:
-        return session.member.role in ('owner', 'admin', 'superuser', 'operator')
+        return session.member.role.id in ('OWNER', 'ADMINISTRATOR')
     return False
