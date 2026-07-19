@@ -1,14 +1,14 @@
 from nonebot.log import logger
 from nonebot_plugin_alconna import Command, Match
 from nonebot_plugin_uninfo import Uninfo
-from arclet.alconna import Alconna, Args
 
 from Scripts.Managers import data_manager, server_manager
 from Scripts.Utils import get_player_name
+from Scripts.Rules import command_group_rule
 
 logger.debug('加载命令 Send 完毕！')
 
-matcher = Command('send <message:str+>').build(use_cmd_start=True)
+matcher = Command('send <message:str+>').build(rule=command_group_rule, use_cmd_start=True)
 
 
 @matcher.handle()

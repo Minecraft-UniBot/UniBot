@@ -8,10 +8,11 @@ from Scripts.Globals import render_template
 from Scripts.Managers import server_manager
 from Scripts.Network import get_player_uuid
 from Scripts.Utils import turn_message_text
+from Scripts.Rules import command_group_rule
 
 logger.debug('加载命令 List 完毕！')
 
-matcher = Command('list <server?:str>').build(use_cmd_start=True)
+matcher = Command('list <server?:str>').build(rule=command_group_rule, use_cmd_start=True)
 
 
 @matcher.handle()

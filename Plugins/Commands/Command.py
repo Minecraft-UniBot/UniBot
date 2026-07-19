@@ -1,19 +1,22 @@
 from nonebot.log import logger
-from nonebot_plugin_uninfo import Uninfo
+from nonebot_plugin_uninfo import Uninfo, ADMIN
 from nonebot_plugin_alconna import Command, Match
 
 from Scripts.Config import config
 from Scripts.Managers import server_manager
 from Scripts.Utils import turn_message_text
+from Scripts.Rules import command_group_rule
 
 logger.debug('加载命令 Command 完毕！')
 
 # 使用 Args 接收不定长参数，command 部分作为一个整体
-matcher = Command('command <server:str> <command:str+>').build(use_cmd_start=True)
+matcher = Command('command <server:str> <command:str+>').build(rule=command_group_rule, use_cmd_start=True)
 
 
 @matcher.handle()
 async def handle(session: Uninfo, server: Match[str], command: Match[list[str]]):
+    if (not session.member) or session.member.role not in ['ADMINISTRATOR', 'OWNER']:
+        await matcher.finish('缺少必要的管理员权限！')
     if not command.available:
         await matcher.finish('参数不正确！请查看语法后再试。')
     command_string = ' '.join(command.result)

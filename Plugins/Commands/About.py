@@ -3,10 +3,11 @@ from nonebot_plugin_alconna import Command
 
 from Scripts.Managers.Version import version_manager
 from Scripts.Utils import turn_message_text
+from Scripts.Rules import command_group_rule
 
 logger.debug('加载命令 About 完毕！')
 
-matcher = Command('about').build(use_cmd_start=True)
+matcher = Command('about').build(rule=command_group_rule, use_cmd_start=True)
 
 
 @matcher.handle()

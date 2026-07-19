@@ -7,6 +7,7 @@ from nonebot_plugin_alconna import Command
 from nonebot_plugin_uninfo import Uninfo
 
 from Scripts.Utils import turn_message_text
+from Scripts.Rules import command_group_rule
 
 bad_things = (
     '造世吞（直接放飞', '修机器（一修就炸', '挖矿（只挖到原石', '造建筑（啥都没有', '钓鱼（全部是垃圾', '刷附魔（刷的垃圾'
@@ -17,7 +18,7 @@ good_things = (
 
 logger.debug('加载命令 Luck 完毕！')
 
-matcher = Command('luck').build(use_cmd_start=True)
+matcher = Command('luck').build(rule=command_group_rule, use_cmd_start=True)
 
 
 @matcher.handle()

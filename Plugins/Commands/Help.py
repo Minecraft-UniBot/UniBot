@@ -5,10 +5,11 @@ from nonebot_plugin_alconna import Command, Match
 from Scripts.Config import config
 from Scripts.Managers import data_manager
 from Scripts.Utils import turn_message_text
+from Scripts.Rules import command_group_rule
 
 logger.debug('加载命令 Help 完毕！')
 
-matcher = Command('help <command?:str>').build(use_cmd_start=True)
+matcher = Command('help <command?:str>').build(rule=command_group_rule, use_cmd_start=True)
 
 
 @matcher.handle()
