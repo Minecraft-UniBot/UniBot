@@ -41,15 +41,15 @@ segment_mapping = {
 
 
 def message_to_text(message: UniMsg):
-    """将 UniMsg 转换为文本"""
+    '''将 UniMsg 转换为文本'''
 
     texts = [func(seg) for seg in message if (func := segment_mapping.get(seg.type)) is not None if func(seg)]
     return ' '.join(texts)
 
 
 def build_server_message(source: str, player: str, content: str):
-    """构建服务器消息"""
-    now_time = datetime.now().strftime("%H:%M:%S")
+    '''构建服务器消息'''
+    now_time = datetime.now().strftime('%H:%M:%S')
     hover_event = HoverEvent(action=HoverAction.show_text, contents=Component(text=now_time))
     message = MessageSegment.text(f'[{source}] ', color=config.sync_color_source, hover_event=hover_event)
     message += MessageSegment.text(f'[{player}] ', color=config.sync_color_player, hover_event=hover_event)
@@ -73,7 +73,7 @@ async def send_message_to_group(message: str):
 
 @notice_watcher.handle()
 async def handle_player_join(event: PlayerJoinEvent):
-    """处理玩家加入服务器事件"""
+    '''处理玩家加入服务器事件'''
     name = event.server_name
     player = event.player.nickname
     logger.info(f'收到玩家 {player} 加入服务器 [{name}] 通知！')
@@ -98,7 +98,7 @@ async def handle_player_join(event: PlayerJoinEvent):
 
 @notice_watcher.handle()
 async def handle_player_quit(event: PlayerQuitEvent):
-    """处理玩家离开服务器事件"""
+    '''处理玩家离开服务器事件'''
     name = event.server_name
     player = event.player.nickname
     logger.info(f'收到玩家 {player} 离开服务器 [{name}] 通知！')
@@ -119,7 +119,7 @@ async def handle_player_quit(event: PlayerQuitEvent):
 
 @notice_watcher.handle()
 async def handle_player_death(event: PlayerDeathEvent):
-    """处理玩家死亡事件"""
+    '''处理玩家死亡事件'''
     name = event.server_name
     player = event.player.nickname
     death_message = event.death.text or f'{player} 死亡了'
@@ -135,7 +135,7 @@ async def handle_player_death(event: PlayerDeathEvent):
 
 @message_watcher.handle()
 async def handle_player_chat(event: PlayerChatEvent):
-    """处理玩家聊天事件"""
+    '''处理玩家聊天事件'''
     name = event.server_name
     player = event.player.nickname
     chat_message = str(event.message)

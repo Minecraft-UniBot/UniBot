@@ -8,14 +8,14 @@ from ..Config import config
 
 
 class ServerManager:
-    """Minecraft 服务器管理器，封装与 Minecraft 的交互"""
+    '''Minecraft 服务器管理器，封装与 Minecraft 的交互'''
     servers = None
 
     def init(self):
         self.servers = get_adapter(MCAdapter).bots
 
     def get_server(self, server_flag: str | int) -> MCServer | None:
-        """通过名称或编号获取 Minecraft 机器人"""
+        '''通过名称或编号获取 Minecraft 机器人'''
         if self.servers is None:
             return None
         if isinstance(server_flag, int) or (isinstance(server_flag, str) and server_flag.isdigit()):
@@ -26,11 +26,11 @@ class ServerManager:
         return self.servers.get(server_flag, None)
 
     def check_online(self):
-        """是否有 Minecraft 服务器在线"""
+        '''是否有 Minecraft 服务器在线'''
         return bool(self.servers)
 
     async def execute(self, command: str, server_flag: str | int | None = None):
-        """执行 Minecraft 指令，server_flag 为 None 时广播到所有服务器"""
+        '''执行 Minecraft 指令，server_flag 为 None 时广播到所有服务器'''
         if self.servers is None:
             return None
         if server_flag is not None:
@@ -49,7 +49,7 @@ class ServerManager:
         return results
 
     async def send_message(self, message: Message | str):
-        """发送消息到所有 Minecraft 服务器"""
+        '''发送消息到所有 Minecraft 服务器'''
         if self.servers is None:
             return
         for name, bot in self.servers.items():
@@ -60,7 +60,7 @@ class ServerManager:
                 logger.warning(f'向服务器 [{name}] 发送消息失败：{e}')
 
     async def broadcast(self, message: Message | str, except_server: str = ''):
-        """广播消息到所有服务器（除 except_server 外）"""
+        '''广播消息到所有服务器（除 except_server 外）'''
         if self.servers is None:
             return
         for name, bot in self.servers.items():

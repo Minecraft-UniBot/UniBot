@@ -1,19 +1,13 @@
 from nonebot.log import logger
-from nonebot_plugin_alconna import on_alconna, Match
-from nonebot_plugin_uninfo import Uninfo
-from arclet.alconna import Alconna, Args
+from nonebot_plugin_alconna import Command
 
-from Scripts.Config import config
 from Scripts.Managers import server_manager
 from Scripts.Utils import turn_message_text
 
 logger.debug('加载命令 Server 完毕！')
 
 # 使用 Args 接收不定长参数，command 部分作为一个整体
-matcher = on_alconna(
-    Alconna('server'),
-    use_cmd_start=True,
-)
+matcher = Command('server').build(use_cmd_start=True)
 
 
 @matcher.handle()

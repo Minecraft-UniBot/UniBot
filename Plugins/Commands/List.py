@@ -1,6 +1,7 @@
 from nonebot.log import logger
-from nonebot_plugin_alconna import on_alconna, Match
-from arclet.alconna import Alconna, Args
+from nonebot.adapters.minecraft import Bot as Server
+
+from nonebot_plugin_alconna import Command, Match
 
 from Scripts.Config import config
 from Scripts.Globals import render_template
@@ -10,10 +11,7 @@ from Scripts.Utils import turn_message_text
 
 logger.debug('加载命令 List 完毕！')
 
-matcher = on_alconna(
-    Alconna("list", Args["server?", str]),
-    use_cmd_start=True,
-)
+matcher = Command('list <server?:str>').build(use_cmd_start=True)
 
 
 @matcher.handle()
@@ -25,7 +23,7 @@ async def handle(server: Match[str]):
     if config.image_mode:
         player_uuids = {}
         for players in response.values():
-            for player in players[0]:
+            for player in players[0]:       
                 player_uuids[player] = await get_player_uuid(player)
         image = await render_template('List.html', (700, 1000), player_list=response, uuids=player_uuids)
         await matcher.finish(image)
@@ -33,15 +31,16 @@ async def handle(server: Match[str]):
     await matcher.finish(message)
 
 
-async def get_player_list(bot):
-    """通过 RCON 命令获取玩家列表"""
+async def get_player_list(bot: Server):
+    '''通过 RCON 命令获取玩家列表'''
     try:
-        result = await bot.send_rcon_command('list')
-    except Exception:
+        result = await bot.send_rcon_command(command='list')
+    except Exception as e:
+        print(e)
         return None
     if not result:
         return None
-    # 解析 "There are X of max Y players online: player1, player2, ..."
+    # 解析 'There are X of max Y players online: player1, player2, ...'
     if ':' in result:
         players_str = result.split(':')[1].strip()
         if players_str:
@@ -56,21 +55,24 @@ def classify_players(players: list):
     for player in players:
         if player.upper().startswith(config.bot_prefix):
             fake_players.append(player)
-        else:
-            real_players.append(player)
+            continue
+        real_players.append(player)
     return real_players, fake_players
 
 
-async def get_players(server_flag: str = None):
+async def get_players(server_flag: str = ''):
+    if not server_manager.servers:
+        return False, '当前没有已连接的服务器！'
     if server_flag:
-        bot = server_manager.get_server(server_flag)
-        if bot is None:
+        server = server_manager.get_server(server_flag)
+        if server is None:
             return False, f'没有找到已连接的 [{server_flag}] 服务器！请检查编号或名称是否输入正确。'
-        players = await get_player_list(bot)
-        return True, {bot.self_id: classify_players(players) if players else ([],)}
+        players = await get_player_list(server)
+        return True, {server.self_id: classify_players(players) if players else ([],)}
     players = {}
-    for name, bot in server_manager.servers.items():
-        result = await get_player_list(bot)
+    for name, server in server_manager.servers.items():
+        result = await get_player_list(server)
+        print(f'[{name}] 玩家列表：{result}')
         players[name] = classify_players(result) if result is not None else ([],)
     if not players:
         return False, '当前没有已连接的服务器！'

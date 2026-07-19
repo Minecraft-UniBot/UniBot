@@ -1,5 +1,5 @@
 from nonebot.log import logger
-from nonebot_plugin_alconna import on_alconna, Match
+from nonebot_plugin_alconna import Command, Match
 from nonebot_plugin_uninfo import Uninfo
 from arclet.alconna import Alconna, Args
 
@@ -8,17 +8,14 @@ from Scripts.Utils import get_player_name
 
 logger.debug('加载命令 Send 完毕！')
 
-matcher = on_alconna(
-    Alconna("send", Args["message?", str]),
-    use_cmd_start=True,
-)
+matcher = Command('send <message:str+>').build(use_cmd_start=True)
 
 
 @matcher.handle()
-async def handle(session: Uninfo, message: Match[str]):
+async def handle(session: Uninfo, message: Match[list[str]]):
     if not message.available:
         await matcher.finish('参数错误，请检查命令格式！')
-    msg = message.result.strip()
+    msg = ' '.join(message.result).strip()
     if not msg:
         await matcher.finish('参数错误，请检查命令格式！')
     user_id = str(session.user.id)

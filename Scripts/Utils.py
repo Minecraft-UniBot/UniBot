@@ -26,7 +26,7 @@ def get_player_name(name: str) -> str | None:
 
 
 def get_permission(session) -> bool:
-    """检查用户是否为超级用户或管理员"""
+    '''检查用户是否为超级用户或管理员'''
     uid = str(session.user.id)
     if uid in config.superusers:
         return True
