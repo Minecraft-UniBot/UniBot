@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="header">
+    <div class="title">白名单绑定</div>
+    <div class="subtitle">WHITELIST BINDINGS</div>
+</div>
+<div class="title-bar"></div>
+{% if bindings %}
+{% for item in bindings %}
+<div class="bound-card">
+    <div class="bound-user">{{ item.user }}</div>
+    <div class="bound-arrow">→</div>
+    <div class="bound-players">
+        {% for player in item.players %}
+        <span class="bound-player-tag">{{ player }}</span>
+        {% endfor %}
+    </div>
+</div>
+{% endfor %}
+{% else %}
+<div class="bound-empty">当前没有绑定任何玩家！</div>
+{% endif %}
+{% endblock %}

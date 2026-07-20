@@ -1,0 +1,45 @@
+/* ===== 版本信息 ===== */
+.about-card {
+    margin-top: 24px;
+    padding: 20px;
+    border-radius: 5px;
+    background-color: rgba(0, 0, 0, 0.3);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.about-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+}
+
+.about-label {
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.about-value {
+    font-size: 15px;
+    color: #ffffff;
+}
+
+.about-status {
+    font-size: 14px;
+    padding: 3px 10px;
+    border-radius: 4px;
+}
+
+.status-latest {
+    color: #a5d96a;
+    background-color: rgba(139, 195, 74, 0.15);
+    border: 1px solid rgba(139, 195, 74, 0.4);
+}
+
+.status-new {
+    color: #f0c040;
+    background-color: rgba(240, 192, 64, 0.15);
+    border: 1px solid rgba(240, 192, 64, 0.4);
+}
+
+

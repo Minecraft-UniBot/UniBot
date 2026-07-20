@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="header">
+    <div class="title">关于</div>
+    <div class="subtitle">ABOUT MINECRAFT-UNIBOT</div>
+</div>
+<div class="title-bar"></div>
+<div class="about-card">
+    <div class="about-row">
+        <span class="about-label">当前版本</span>
+        <span class="about-value">{{ version }}</span>
+    </div>
+    <div class="about-row">
+        <span class="about-label">版本状态</span>
+        <span class="about-status {{ 'status-new' if has_update else 'status-latest' }}">{{ '发现新版本，请及时更新！' if has_update else '已是最新版本！' }}</span>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="header">
+    <div class="title">今日运势</div>
+    <div class="subtitle">DAILY FORTUNE</div>
+</div>
+<div class="title-bar"></div>
+<div class="luck-score-card">
+    <div class="luck-score">{{ luck_point }}</div>
+</div>
+<div class="luck-items">
+    <div class="luck-item luck-good">
+        <div class="luck-item-label">今日宜</div>
+        <div class="luck-item-value">{{ good_thing }}</div>
+    </div>
+    <div class="luck-item luck-bad">
+        <div class="luck-item-label">今日忌</div>
+        <div class="luck-item-value">{{ bad_thing }}</div>
+    </div>
+</div>
+{% endblock %}

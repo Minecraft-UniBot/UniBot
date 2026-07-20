@@ -1,0 +1,54 @@
+/* ===== 服务器卡片 ===== */
+.server-card {
+    display: flex;
+    align-items: center;
+    margin-top: 16px;
+    padding: 16px 18px;
+    border-radius: 5px;
+    background-color: rgba(0, 0, 0, 0.3);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.server-status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 5px;
+    margin-right: 14px;
+    background-image: linear-gradient(135deg, #a5d96a 0%, #5f9e3f 100%);
+}
+
+.server-info {
+    flex-grow: 1;
+}
+
+.server-name-text {
+    font-size: 16px;
+    color: #ffffff;
+}
+
+.server-index {
+    margin-top: 4px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.server-online {
+    font-size: 13px;
+    color: #a5d96a;
+    padding: 3px 10px;
+    border-radius: 4px;
+    background-color: rgba(139, 195, 74, 0.15);
+    border: 1px solid rgba(139, 195, 74, 0.4);
+}
+
+/* ===== 空状态 ===== */
+.server-empty {
+    margin-top: 30px;
+    padding: 24px;
+    text-align: center;
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.55);
+    border-radius: 5px;
+    background-color: rgba(0, 0, 0, 0.22);
+    border: 2px dashed rgba(255, 255, 255, 0.22);
+}

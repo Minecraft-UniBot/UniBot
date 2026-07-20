@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="header">
+    <div class="title">服务器列表</div>
+    <div class="subtitle">CONNECTED SERVERS</div>
+</div>
+<div class="title-bar"></div>
+{% if servers %}
+{% for srv in servers %}
+<div class="server-card">
+    <div class="server-status-dot"></div>
+    <div class="server-info">
+        <div class="server-name-text">{{ srv.name }}</div>
+        <div class="server-index">编号 {{ srv.index }}</div>
+    </div>
+    <div class="server-online">在线</div>
+</div>
+{% endfor %}
+{% else %}
+<div class="server-empty">当前没有已连接的服务器！</div>
+{% endif %}
+{% endblock %}

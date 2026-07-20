@@ -1,0 +1,52 @@
+/* ===== 分数卡片 ===== */
+.luck-score-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 30px;
+    padding: 30px;
+    border-radius: 6px;
+    background-color: rgba(0, 0, 0, 0.3);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.luck-score {
+    font-size: 64px;
+    color: #a5d96a;
+}
+
+
+
+/* ===== 宜忌 ===== */
+.luck-items {
+    display: flex;
+    gap: 14px;
+    margin-top: 24px;
+}
+
+.luck-item {
+    flex-grow: 1;
+    padding: 18px 16px;
+    border-radius: 5px;
+    background-color: rgba(0, 0, 0, 0.3);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.luck-item-label {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.55);
+    margin-bottom: 10px;
+}
+
+.luck-item-value {
+    font-size: 15px;
+    color: #ffffff;
+}
+
+.luck-good {
+    border: 2px solid rgba(139, 195, 74, 0.4);
+}
+
+.luck-bad {
+    border: 2px solid rgba(240, 100, 80, 0.4);
+}

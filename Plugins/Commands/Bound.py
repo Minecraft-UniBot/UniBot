@@ -2,8 +2,10 @@ from nonebot.log import logger
 
 from nonebot_plugin_uninfo import Uninfo
 from nonebot_plugin_alconna import Match, At, Command
+from nonebot_plugin_alconna.uniseg import Image, UniMessage
 
 from Scripts.Config import config
+from Scripts.Globals import render_template
 from Scripts.Managers import data_manager, server_manager
 from Scripts.Utils import check_player, get_permission
 from Scripts.Rules import command_group_rule
@@ -51,6 +53,13 @@ async def handle_list(session: Uninfo):
         await matcher.finish('你没有权限执行此命令！')
     if not data_manager.players:
         await matcher.finish('当前没有绑定任何玩家！')
+    if config.image_mode:
+        bindings = [
+            {'user': user, 'players': players}
+            for user, players in data_manager.players.items()
+        ]
+        image = await render_template('Bound', (600, 800), bindings=bindings)
+        await matcher.finish(UniMessage(Image(raw=image)))
     message = '白名单列表：\n' + '\n'.join(
         f'  {user} -> {'、'.join(players)}' for user, players in data_manager.players.items()
     )

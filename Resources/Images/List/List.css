@@ -1,0 +1,106 @@
+/* ===== 服务器分区 ===== */
+.server {
+    margin-top: 26px;
+}
+
+.server-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.server-name {
+    display: flex;
+    align-items: center;
+}
+
+.accent {
+    width: 6px;
+    height: 20px;
+    margin-right: 10px;
+    border-radius: 2px;
+    background-image: linear-gradient(180deg, #a5d96a 0%, #5f9e3f 100%);
+}
+
+.server-title {
+    margin: 0;
+    font-size: 20px;
+    color: #f2f2f2;
+}
+
+.count {
+    padding: 4px 12px;
+    font-size: 13px;
+    font-weight: bold;
+    color: #c9e8ac;
+    border-radius: 4px;
+    background-color: rgba(139, 195, 74, 0.16);
+    border: 1px solid rgba(139, 195, 74, 0.45);
+}
+
+.divider {
+    height: 2px;
+    margin-top: 10px;
+    background-color: rgba(255, 255, 255, 0.14);
+    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.45);
+}
+
+/* ===== 玩家卡片 ===== */
+.players {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.player {
+    display: flex;
+    align-items: center;
+    width: 232px;
+    padding: 9px 12px;
+    border-radius: 5px;
+    background-color: rgba(0, 0, 0, 0.34);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    font-size: 15px;
+    font-weight: bold;
+    color: #ececec;
+}
+
+.head {
+    width: 24px;
+    height: 24px;
+    margin-right: 10px;
+    border-radius: 4px;
+    background-image: linear-gradient(135deg, #93d483 0%, #5d9c50 55%, #3c6b36 100%);
+    border: 2px solid rgba(0, 0, 0, 0.45);
+}
+
+img {
+    width: 24px;
+    height: 24px;
+    margin-right: 10px;
+    border-radius: 4px;
+    border: 2px solid rgba(0, 0, 0, 0.45);
+}
+
+.name {
+    flex-grow: 1;
+}
+
+.bot {
+    color: rgba(255, 255, 255, 0.45);
+}
+
+.head-bot {
+    background-image: linear-gradient(135deg, #a7b0b8 0%, #6d7880 55%, #49525a 100%);
+}
+
+.empty {
+    width: 100%;
+    justify-content: center;
+    padding: 18px 12px;
+    font-weight: normal;
+    color: rgba(255, 255, 255, 0.55);
+    background-color: rgba(0, 0, 0, 0.22);
+    border: 2px dashed rgba(255, 255, 255, 0.22);
+}

@@ -2,8 +2,10 @@ from arclet.alconna import Alconna, Subcommand, command_manager
 from arclet.alconna.args import Args
 from nonebot.log import logger
 from nonebot_plugin_alconna import Command, Match
+from nonebot_plugin_alconna.uniseg import Image, UniMessage
 
 from Scripts.Config import config
+from Scripts.Globals import render_template
 from Scripts.Utils import turn_message_text
 from Scripts.Rules import command_group_rule
 
@@ -17,11 +19,59 @@ matcher = (
 
 @matcher.handle()
 async def handle(command: Match[str]):
+    if config.image_mode:
+        if command.available:
+            detail = get_command_detail(command.result)
+            image = await render_template('Help', (600, 800), detail=detail, commands=None)
+        else:
+            commands = get_commands_list()
+            image = await render_template('Help', (600, 800), detail=None, commands=commands)
+        await matcher.finish(UniMessage(Image(raw=image)))
     if command.available:
         message = await turn_message_text(detailed_handler(command.result))
         await matcher.finish(message)
     message = await turn_message_text(help_handler())
     await matcher.finish(message)
+
+
+def get_commands_list() -> list[dict]:
+    """构建命令列表数据用于图片渲染"""
+    commands = []
+    for name in config.command_enabled:
+        alconna = get_alconna(name)
+        if alconna is None:
+            continue
+        usage = alconna.meta.usage or gen_usage(alconna)
+        description = alconna.meta.description or ''
+        subcommands = [option for option in alconna.options if isinstance(option, Subcommand)]
+        sub_list = []
+        for index, subcommand in enumerate(subcommands):
+            branch = '└─' if index == len(subcommands) - 1 else '├─'
+            sub_desc = f' — {subcommand.help_text}' if subcommand.help_text else ''
+            sub_list.append(f'{branch} {subcommand.name}{sub_desc}')
+        commands.append({'usage': usage, 'description': description, 'subcommands': sub_list})
+    return commands
+
+
+def get_command_detail(name: str) -> dict | None:
+    """构建命令详情数据用于图片渲染"""
+    if name not in config.command_enabled:
+        return None
+    alconna = get_alconna(name)
+    if alconna is None:
+        return None
+    args_list = []
+    if isinstance(alconna.args, Args):
+        args_list = [{'name': arg.name, 'notice': arg.notice} for arg in alconna.args if arg.notice]
+    subcommands = [option for option in alconna.options if isinstance(option, Subcommand)]
+    sub_list = [{'name': sub.name, 'usage': sub_usage(sub), 'description': sub.help_text or ''} for sub in subcommands]
+    return {
+        'name': name,
+        'usage': alconna.meta.usage or gen_usage(alconna),
+        'description': alconna.meta.description or '',
+        'args': args_list,
+        'subcommands': sub_list,
+    }
 
 
 def get_alconna(name: str):

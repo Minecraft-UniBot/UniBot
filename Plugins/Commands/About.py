@@ -1,6 +1,9 @@
 from nonebot.log import logger
 from nonebot_plugin_alconna import Command
+from nonebot_plugin_alconna.uniseg import Image, UniMessage
 
+from Scripts.Config import config
+from Scripts.Globals import render_template
 from Scripts.Managers.Version import version_manager
 from Scripts.Utils import turn_message_text
 from Scripts.Rules import command_group_rule
@@ -15,6 +18,11 @@ matcher = (
 
 @matcher.handle()
 async def handle():
+    if config.image_mode:
+        image = await render_template('About', (600, 0),
+                                      version=version_manager.version,
+                                      has_update=version_manager.check_update())
+        await matcher.finish(UniMessage(Image(raw=image)))
     message = await turn_message_text(about_handler())
     await matcher.finish(message)
 

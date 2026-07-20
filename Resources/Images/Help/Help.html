@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="header">
+    <div class="title">{{ '命令详情' if detail else '命令列表' }}</div>
+    <div class="subtitle">COMMAND HELP</div>
+</div>
+<div class="title-bar"></div>
+{% if detail %}
+<div class="help-detail-card">
+    <div class="help-detail-name">{{ detail.name }}</div>
+    <div class="help-detail-usage">{{ detail.usage }}</div>
+    {% if detail.description %}
+    <div class="help-detail-desc">{{ detail.description }}</div>
+    {% endif %}
+    {% if detail.args %}
+    <div class="help-args-title">参数说明</div>
+    {% for arg in detail.args %}
+    <div class="help-arg-item">
+        <span class="help-arg-name">{{ arg.name }}</span>
+        <span class="help-arg-desc">{{ arg.notice }}</span>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% if detail.subcommands %}
+    <div class="help-args-title">子命令</div>
+    {% for sub in detail.subcommands %}
+    <div class="help-sub-item">
+        <span class="help-sub-name">{{ sub.usage }}</span>
+        <span class="help-sub-desc">{{ sub.description }}</span>
+    </div>
+    {% endfor %}
+    {% endif %}
+</div>
+{% else %}
+{% for cmd in commands %}
+<div class="help-cmd-card">
+    <div class="help-cmd-usage">{{ cmd.usage }}</div>
+    <div class="help-cmd-desc">{{ cmd.description }}</div>
+    {% if cmd.subcommands %}
+    {% for sub in cmd.subcommands %}
+    <div class="help-cmd-sub">{{ sub }}</div>
+    {% endfor %}
+    {% endif %}
+</div>
+{% endfor %}
+<div class="help-note">注：&lt;name&gt; 代表必填参数，&lt;*name&gt; 代表可选参数。</div>
+{% endif %}
+{% endblock %}

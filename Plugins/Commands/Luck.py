@@ -4,8 +4,11 @@ from hashlib import md5
 
 from nonebot.log import logger
 from nonebot_plugin_alconna import Command
+from nonebot_plugin_alconna.uniseg import Image, UniMessage
 from nonebot_plugin_uninfo import Uninfo
 
+from Scripts.Config import config
+from Scripts.Globals import render_template
 from Scripts.Utils import turn_message_text
 from Scripts.Rules import command_group_rule
 
@@ -26,11 +29,15 @@ matcher = (
 
 @matcher.handle()
 async def handle(session: Uninfo):
-    message = await turn_message_text(luck_handler(session))
+    luck_data = get_luck_data(session)
+    if config.image_mode:
+        image = await render_template('Luck', (500, 0), **luck_data)
+        await matcher.finish(UniMessage(Image(raw=image)))
+    message = await turn_message_text(luck_handler(luck_data))
     await matcher.finish(message)
 
 
-def luck_handler(session: Uninfo):
+def get_luck_data(session: Uninfo) -> dict:
     user_id = str(session.user.id)
     scene_id = str(session.scene.id)
     seed_hash = md5(f'{date.today()} {scene_id} {user_id}'.encode())
@@ -43,10 +50,19 @@ def luck_handler(session: Uninfo):
         tips = '喵~'
     elif luck_point > 30:
         tips = '呜……'
-    yield f'你今天的人品为 {luck_point}，{tips}'
     bad_thing = bad_things[(seed & int(scene_id.replace('-', '0'), 32)) % len(bad_things)]
     good_thing = good_things[(seed ^ int(scene_id.replace('-', '0'), 32)) % len(good_things)]
-    yield f'今日宜：{good_thing}'
     if bad_thing.startswith(good_thing[:2]):
         bad_thing = bad_things[bad_things.index(bad_thing) - 1]
-    yield f'今日忌：{bad_thing}'
+    return {
+        'luck_point': luck_point,
+        'tips': tips,
+        'good_thing': good_thing,
+        'bad_thing': bad_thing,
+    }
+
+
+def luck_handler(data: dict):
+    yield f'你今天的人品为 {data["luck_point"]}，{data["tips"]}'
+    yield f'今日宜：{data["good_thing"]}'
+    yield f'今日忌：{data["bad_thing"]}'

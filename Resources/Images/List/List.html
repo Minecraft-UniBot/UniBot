@@ -1,113 +1,45 @@
-<!DOCTYPE html>
-<html lang="zh-cn">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8"/>
-    <style>
-        body {
-            margin: 0;
-            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        body main {
-            padding: 30px;
-            width: 800px;
-            min-height: 1000px;
-            box-sizing: border-box;
-            background-size: cover;
-            background-position: center center;
-            background-repeat: no-repeat;
-            background-image: {{ background }};
-        }
-
-        body main .container {
-            width: 100%;
-            min-height: 400px;
-            padding: 35px;
-            border-radius: 10px;
-            box-sizing: border-box;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            background-color: rgba(255, 255, 255, 0.5);
-        }
-
-        body main .container h1 {
-            margin: 0;
-            text-align: center;
-        }
-
-        body main .container .server {
-            margin-top: 30px;
-        }
-
-        body main .container .server h2 {
-            margin-top: 0;
-            margin-left: 50px;
-        }
-
-        body main .container .server h2::after {
-            content: "";
-            display: block;
-            height: 1px;
-            margin-top: 5px;
-            width: calc(100% - 50px);
-            background-color: rgba(0, 0, 0, 0.3);
-        }
-
-        body main .container .server .players {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        body main .container .server .players span {
-            text-wrap: nowrap;
-            display: flex;
-            align-items: center;
-            width: calc(33.33% - 10px);
-        }
-
-        body main .container .server .players span.bot {
-            opacity: .5;
-            margin-left: 30px;
-            box-sizing: border-box;
-        }
-
-        body main .container .server .players span img {
-            margin-right: 10px;
-        }
-    </style>
-</head>
-
-<body>
-<main>
-    <div class="container">
-        <h1>在线玩家列表</h1>
-        {% for server, (real_players, fake_players) in player_list.items() %}
-        <div class="server">
-            <h2>{{ server }}</h2>
-            <div class="players">
-                {% if real_players or fake_players %}
-                {% for player in real_players %}
-                <span>
-                            <img alt="{{ player }}"
-                                 src="https://crafatar.com/avatars/{{ uuids[player] }}?size=20&overlay"/>
-                            <span>{{ player }}</span>
-                        </span>
-                {% endfor %}
-                {% for player in fake_players %}
-                <span class="bot">
-                            <span>{{ player }}</span>
-                        </span>
-                {% endfor %}
-                {% else %}
-                <span style="margin-left: 30px;">暂无在线玩家！</span>
-                {% endif %}
-            </div>
-            {% endfor %}
+{% block content %}
+<div class="header">
+    <h1 class="title">在线玩家列表</h1>
+    <div class="subtitle">ONLINE PLAYERS</div>
+</div>
+<div class="title-bar"></div>
+{% for server, players_data in player_list.items() %}
+{% if players_data | length == 2 %}
+{% set real_players, fake_players = players_data %}
+{% else %}
+{% set real_players, fake_players = players_data[0], [] %}
+{% endif %}
+<div class="server">
+    <div class="server-header">
+        <div class="server-name">
+            <div class="accent"></div>
+            <h2 class="server-title">{{ server }}</h2>
         </div>
+        <div class="count">{{ real_players | length + fake_players | length }} 人在线</div>
     </div>
-</main>
-</body>
-
-</html>
+    <div class="divider"></div>
+    <div class="players">
+        {% if real_players or fake_players %}
+        {% for player in real_players %}
+        <div class="player">
+            {# <img src="https://crafatar.com/avatars/{{ uuids[player] }}?size=24&overlay"/> #}
+            <span class="head"></span>
+            <span class="name">{{ player }}</span>
+        </div>
+        {% endfor %}
+        {% for player in fake_players %}
+        <div class="player bot">
+            <span class="head head-bot"></span>
+            <span class="name">{{ player }}</span>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="player empty">暂无在线玩家！</div>
+        {% endif %}
+    </div>
+</div>
+{% endfor %}
+{% endblock %}

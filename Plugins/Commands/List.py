@@ -2,9 +2,10 @@ from nonebot.log import logger
 from nonebot.adapters.minecraft import Bot as Server
 
 from nonebot_plugin_alconna import Command, Match
+from nonebot_plugin_alconna.uniseg import Image, UniMessage
 
 from Scripts.Config import config
-# from Scripts.Globals import render_template
+from Scripts.Globals import render_template
 from Scripts.Managers import server_manager
 from Scripts.Network import get_player_uuid
 from Scripts.Utils import turn_message_text
@@ -29,8 +30,8 @@ async def handle(server: Match[str]):
         for players in response.values():
             for player in players[0]:
                 player_uuids[player] = await get_player_uuid(player)
-        image = await render_template('List.html', (700, 1000), player_list=response, uuids=player_uuids)
-        await matcher.finish(image)
+        image = await render_template('List', (600, 800), player_list=response, uuids=player_uuids)
+        await matcher.finish(UniMessage(Image(raw=image)))
     message = await turn_message_text(list_handler(response))
     await matcher.finish(message)
 
@@ -76,7 +77,6 @@ async def get_players(server_flag: str = ''):
     players = {}
     for name, server in server_manager.servers.items():
         result = await get_player_list(server)
-        print(f'[{name}] 玩家列表：{result}')
         players[name] = classify_players(result) if result is not None else ([],)
     if not players:
         return False, '当前没有已连接的服务器！'

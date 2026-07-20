@@ -1,0 +1,49 @@
+/* ===== 绑定卡片 ===== */
+.bound-card {
+    display: flex;
+    align-items: center;
+    margin-top: 14px;
+    padding: 14px 18px;
+    border-radius: 5px;
+    background-color: rgba(0, 0, 0, 0.3);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.bound-user {
+    font-size: 15px;
+    color: #ffffff;
+    margin-right: 12px;
+}
+
+.bound-arrow {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.4);
+    margin-right: 12px;
+}
+
+.bound-players {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.bound-player-tag {
+    font-size: 13px;
+    color: #a5d96a;
+    padding: 3px 10px;
+    border-radius: 4px;
+    background-color: rgba(139, 195, 74, 0.15);
+    border: 1px solid rgba(139, 195, 74, 0.4);
+}
+
+/* ===== 空状态 ===== */
+.bound-empty {
+    margin-top: 30px;
+    padding: 24px;
+    text-align: center;
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.55);
+    border-radius: 5px;
+    background-color: rgba(0, 0, 0, 0.22);
+    border: 2px dashed rgba(255, 255, 255, 0.22);
+}
