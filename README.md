@@ -1,7 +1,7 @@
 <p align="center">
   <img src="https://img.shields.io/github/v/release/Minecraft-QQBot/BotServer" alt="版本">
   <img src="https://img.shields.io/github/license/Minecraft-QQBot/BotServer" alt="许可证">
-  <img src="https://img.shields.io/badge/Python-3.10%2B-blue" alt="Python">
+  <img src="https://img.shields.io/badge/Python-3.11%2B-blue" alt="Python">
   <img src="https://img.shields.io/badge/NoneBot2-2.2%2B-purple" alt="NoneBot2">
   <img src="https://img.shields.io/github/downloads/Minecraft-QQBot/BotServer/total" alt="下载量">
 </p>
@@ -41,7 +41,7 @@
 
 ### 前置要求
 
-- Python 3.10 ~ 3.14
+- Python 3.11+
 - [UV](https://docs.astral.sh/uv/)（推荐，快速包管理器）或 pip
 - Minecraft Java 服务端（需安装 [鹊桥插件](https://github.com/17TheWord/MC_QQ_Spigot)）
 - 一个 QQ 机器人账号（或其他平台账号）
@@ -61,14 +61,12 @@ uv sync
 # 如需启用图片渲染模式，额外安装 image 依赖
 uv sync --extra image
 
-# 复制环境配置模板
-cp .env.example .env
-
-# 编辑 .env 配置文件（按需修改）
-# vim .env
+# 编辑配置文件（按需修改）
+# .env — NoneBot 框架与适配器配置
+# Config.toml — 机器人自定义配置
 
 # 启动机器人
-uv run nb run
+uv run Bot.py
 ```
 
 > **为什么推荐 UV？**
@@ -91,8 +89,7 @@ pip install -e .
 # 如需启用图片渲染模式，额外安装 image 依赖
 pip install -e ".[image]"
 
-# 配置环境
-vim .env
+# 配置环境（编辑 .env 与 Config.toml）
 
 # 启动
 python3 Bot.py
@@ -125,22 +122,74 @@ docker run -d \
 
 ### ⚙️ 配置说明
 
-创建 `.env` 文件后，至少需要配置以下关键项：
+项目采用 **双配置文件** 体系：
+
+| 文件 | 用途 | 格式 |
+|------|------|------|
+| `.env` | NoneBot 框架配置与适配器配置 | INI 风格 |
+| `Config.toml` | 机器人自定义配置（指令、消息同步、图片渲染、AI 等） | TOML |
+
+#### `.env` — 框架与适配器
 
 ```ini
-# 管理员 QQ 号列表
-SUPERUSERS=["123456789"]
+# 监听端口与主机
+PORT=8000
+HOST="127.0.0.1"
 
-# 推送消息的群组（支持多群）
-MESSAGE_GROUPS=["qq:123456789"]
+# 超级用户（管理员 QQ 号）
+SUPERUSERS=["1234567890"]
+
+# 命令起始字符与分隔符
+COMMAND_SEP=[" "]
+COMMAND_START=["."]
 
 # Minecraft 服务器 WebSocket 地址（支持多服）
-MINECRAFT_WS_URLS={"server1": ["ws://你的IP:端口/路径"]}
-
-…………
+MINECRAFT_WS_URLS={"server1": ["ws://127.0.0.1:8080/mc"]}
 ```
 
-> 📖 完整配置项说明请参阅 `.env` 文件内注释。
+#### `Config.toml` — 自定义配置
+
+```toml
+# 连接密钥（公网部署务必设置）
+token = ""
+
+# 启用的指令（send 仅在 sync_all_qq_message 为 false 时生效）
+command_enabled = ["list", "luck", "server", "help", "bound", "command", "send"]
+
+# 指令响应群 / 消息同步群（格式 "{平台}:{群ID}"）
+command_groups = ["qq_client:123456789"]
+message_groups = ["qq_client:123456789"]
+
+# 消息同步开关
+sync_all_qq_message = true       # 群消息 → 服务器
+sync_all_game_message = false    # 服务器消息 → 群
+sync_message_between_servers = false  # 服务器之间互转
+
+# 图片渲染模式
+[image]
+mode = false
+background = 'url("./Resources/Backgrounds/dirt.png")'
+
+# AI 对话（OpenAI 兼容 API）
+[ai]
+enabled = false
+base_url = ""
+model_name = ""
+api_key = ""
+system_prompt = "你是一个可爱的小女孩……"
+
+# 关键词自动回复
+[auto_reply]
+enabled = false
+keywords = { "看群公告里的 IP 地址。" = ["服务器在哪", "服务器地址"] }
+
+# API 服务器
+[api]
+enabled = false
+token = ""
+```
+
+> 📖 完整配置项说明请参阅 `Config.toml` 与 `.env` 文件内注释。
 
 ## 🎯 功能一览
 
@@ -156,42 +205,43 @@ MINECRAFT_WS_URLS={"server1": ["ws://你的IP:端口/路径"]}
 
 | 指令 | 功能 |
 |------|------|
-| `/list` | 查询所有服务器的在线玩家 |
-| `/server` | 查看当前连接的服务器列表 |
-| `/luck` | 每日运势占卜（仅供娱乐） |
-| `/send` | 向游戏内发送消息 |
-| `/command` | 远程执行 Minecraft 指令（管理员） |
-| `/bound` | 绑定 / 解绑 / 查询游戏白名单 |
-| `/help` | 查看命令帮助 |
-| `/about` | 关于本机器人 |
+| `.list` | 查询所有服务器的在线玩家 |
+| `.server` | 查看当前连接的服务器列表 |
+| `.luck` | 每日运势占卜（仅供娱乐） |
+| `.send` | 向游戏内发送消息（`sync_all_qq_message` 关闭时可用） |
+| `.command` | 远程执行 Minecraft 指令（管理员） |
+| `.bound` | 绑定 / 解绑 / 查询游戏白名单 |
+| `.help` | 查看命令帮助 |
+| `.about` | 关于本机器人 |
 
 > 💡 所有指令均基于 [Alconna](https://github.com/ArcletProject/Alconna) 解析，跨平台表现一致。
 
 ### 🎨 图片渲染模式
 
-启用 `IMAGE_MODE` 后，机器人的指令输出将以 **图片** 形式发送，而非纯文本。渲染引擎基于 HTML + CSS 模板（Jinja2 + html2pic），效果美观且高度可定制。
+在 `Config.toml` 中设置 `[image] mode = true` 后，机器人的指令输出将以 **图片** 形式发送，而非纯文本。渲染引擎基于 HTML + CSS 模板（Jinja2 + html2pic），效果美观且高度可定制。
 
 **支持图片渲染的指令：**
 
 | 指令 | 渲染内容 |
 |------|----------|
-| `/list` | 在线玩家列表（含玩家头像） |
-| `/server` | 服务器连接状态 |
-| `/luck` | 每日运势卡片 |
-| `/bound` | 白名单绑定信息 |
-| `/help` | 帮助信息 |
-| `/about` | 关于页面 |
+| `.list` | 在线玩家列表（含玩家头像） |
+| `.server` | 服务器连接状态 |
+| `.luck` | 每日运势卡片 |
+| `.bound` | 白名单绑定信息 |
+| `.help` | 帮助信息 |
+| `.about` | 关于页面 |
 
 **自定义背景：**
 
-通过 `IMAGE_BACKGROUND` 配置项设置图片背景，值为 CSS `background-image` 属性值：
+在 `Config.toml` 的 `[image]` 下设置 `background`，值为 CSS `background-image` 属性值：
 
-```ini
+```toml
+[image]
 # 使用本地图片
-IMAGE_BACKGROUND=url("./Resources/Backgrounds/dirt.png")
+background = 'url("./Resources/Backgrounds/dirt.png")'
 
 # 使用渐变色
-IMAGE_BACKGROUND=linear-gradient(150deg, #2e4a30 0%, #1d3524 55%, #12241a 100%)
+background = 'linear-gradient(150deg, #2e4a30 0%, #1d3524 55%, #12241a 100%)'
 ```
 
 > ⚠️ 图片模式会略微增加响应时间（需渲染 HTML 并转换为图片）。模板文件位于 `Resources/Images/` 目录，可自行修改 HTML/CSS 定制样式。
@@ -203,18 +253,22 @@ IMAGE_BACKGROUND=linear-gradient(150deg, #2e4a30 0%, #1d3524 55%, #12241a 100%)
 
 ### 灵活配置
 
-- 按需启停指令模块
-- 自定义消息格式与颜色
-- 敏感词过滤
-- 兼容模式支持
-- API 接口开放（可选）
+- 按需启停指令模块（`command_enabled`）
+- 自定义消息转发颜色（`sync_color_*`）
+- 敏感词过滤（`sync_sensitive_words`）
+- 兼容模式支持（`list_compatible_mode`）
+- 假人前缀分类（`bot_prefix`）
+- 指令黑白名单（`command_minecraft_whitelist` / `command_minecraft_blacklist`）
+- 绑定数量限制（`qq_bound_max_number`）
+- 服务器信息缓存策略（`server_memory_update_interval` / `server_memory_max_cache`）
+- API 接口开放（可选，`[api]`）
 
 ---
 
 ## 🏗️ 架构设计
 
 ```txt
-BotServer
+UniBot
 ├── nonebot2 核心                    ← 异步事件驱动框架
 ├── nonebot-adapter-minecraft       ← Minecraft WebSocket 通信
 ├── nonebot-plugin-alconna          ← 跨平台命令解析
@@ -297,7 +351,7 @@ flowchart TB
 | WebSocket 通信 | ✅ 实时长连接 | ⚠️ 多为 HTTP 轮询 |
 | 模块化插件 | ✅ 指令即插即用 | ❌ 单体耦合 |
 | AI 集成 | ✅ 开箱即用 | ❌ 需自行对接 |
-| Docker 部署 | ✅ 一键启动 | ⚠️ 视项目而定 |
+| 图片渲染 | ✅ HTML/CSS 模板引擎 | ❌ 无 |
 | 白名单管理 | ✅ 完善的绑定系统 | ❌ 无或基础 |
 
 ---
