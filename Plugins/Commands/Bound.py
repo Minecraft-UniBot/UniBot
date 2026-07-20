@@ -53,7 +53,7 @@ async def handle_list(session: Uninfo):
         await matcher.finish('你没有权限执行此命令！')
     if not data_manager.players:
         await matcher.finish('当前没有绑定任何玩家！')
-    if config.image_mode:
+    if config.image.mode:
         bindings = [
             {'user': user, 'players': players}
             for user, players in data_manager.players.items()

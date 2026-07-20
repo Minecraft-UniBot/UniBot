@@ -1,18 +1,27 @@
 import asyncio
+import tomllib
+import importlib
 from pathlib import Path
 
 import nonebot
-from nonebot.adapters.onebot.v11 import Adapter as OneBotAdapter
-from nonebot.adapters.minecraft import Adapter as MinecraftAdapter
 from nonebot.log import logger
 
 nonebot.init()
 
 driver = nonebot.get_driver()
-driver.register_adapter(OneBotAdapter)
-driver.register_adapter(MinecraftAdapter)
 
-nonebot.load_plugins('Plugins')
+with open('pyproject.toml', 'rb') as file:
+    config = tomllib.load(file)['tool']['nonebot']
+
+for adapter in config.get('adapters', []):
+    module = importlib.import_module(adapter['module_name'])
+    driver.register_adapter(getattr(module, 'Adapter'))
+
+for plugin in config.get('plugins', []):
+    nonebot.load_plugin(plugin)
+
+for plugin_dir in config.get('plugin_dirs', []):
+    nonebot.load_plugins(plugin_dir)
 
 
 def main():

@@ -1,0 +1,115 @@
+# UniBot 自定义配置
+# NoneBot 框架配置（PORT、HOST、SUPERUSERS、COMMAND_SEP、COMMAND_START、LOG_LEVEL）
+# 及适配器配置（ONEBOT_ACCESS_TOKEN、MINECRAFT_WS_URLS、MINECRAFT_ACCESS_TOKEN）仍在 .env 中配置。
+# 本文件使用 TOML 格式，嵌套表会自动展平为 Config 字段（如 [ai] 下的 enabled → ai_enabled）。
+
+# 密钥，用来防止别人连接到你的机器人，公网机器运行请务必设置。
+token = ""
+
+# 是否将所有的管理员视为超级用户。
+admin_superusers = true
+
+# 假人前缀，即使用 list 指令时的分类依据，以及进服广播的判定依据。
+# 若你服务器没有假人或者你不想对玩家进行分类，留空即可。
+bot_prefix = ""
+
+# 启用的指令。send 指令仅在 sync_all_qq_message 为 false 时生效。
+command_enabled = ["list", "luck", "server", "help", "bound", "command", "send"]
+
+# 指令群，机器人只对这些群的指令作响应。
+# 格式 "{平台}:{群ID}"，平台对应：
+#   qq_client / qq_guild / qq_api / telegram / discord / dodo / kook / wechat / wecom / onebot12_other / satori_other
+command_groups = ["qq_client:123456789"]
+
+# 消息群（即使用指令发送到消息的 QQ 群，以及把群内消息同步到游戏内的群）。
+message_groups = ["qq_client:123456789"]
+
+# Command 指令的白名单，只有以这个列表里的指令开头的指令才被允许执行。
+# 若有填写请保留空的 command_minecraft_blacklist 或删除此字段。
+command_minecraft_whitelist = []
+
+# Command 指令的黑名单，启用后以这个列表里的指令开头的指令将被禁止执行。
+command_minecraft_blacklist = []
+
+# 是否播报服务器开启/关闭（播报到其他服务器和 QQ 群）。
+broadcast_server = true
+
+# 是否播报玩家进入/离开服务器。
+broadcast_player = true
+
+# 是否把消息群内的所有消息转发到服务器内。关闭后如需向服务器发送消息，请使用 .send 指令。
+sync_all_qq_message = true
+
+# 是否转发所有在服务器内发送的消息到 QQ 群。
+sync_all_game_message = false
+
+# 是否把服务器内的消息转发到其他的服务器。
+sync_message_between_servers = false
+
+# 含有这些敏感词语中的任意一个的消息都不会被同步到 QQ 群，而是提醒违禁。
+sync_sensitive_words = ["敏感词", "你妈", "色图"]
+
+# 获取玩家列表的兼容模式。
+# 开启后通过监听玩家进入和离开来更新玩家列表，但可能并不准确。
+list_compatible_mode = false
+
+# 白名单的指令，默认为 whitelist 指令。
+whitelist_command = "whitelist"
+
+# 设置转发消息的颜色，包括 QQ 群内的消息和其他服务器内的转发消息。
+# 有效值：black / dark_blue / dark_green / dark_aqua / dark_red / dark_purple / gold / gray /
+#         dark_gray / blue / green / aqua / red / light_purple / yellow / white / reset
+# 设置为 #<hex> 可以使用 6 位十六进制 RGB 颜色。
+sync_color_source = "gray"
+sync_color_player = "gray"
+sync_color_message = "gray"
+
+# 绑定 QQ 号的最大数量，设置 0 表示不限制。
+qq_bound_max_number = 1
+
+# 更新服务器信息的间隔时间，单位为分钟。
+server_memory_update_interval = 5
+
+# 服务器信息的缓存时间，为几个单位（前面的 server_memory_update_interval 为一个单位）。
+# 超过这个时间的服务器信息将会被删除。
+server_memory_max_cache = 200
+
+[image]
+# 是否启用图片模式。
+# 启用后机器人将会把所发送的消息渲染为图片，但需额外配置，且响应速度会变慢。
+mode = false
+
+# 生成图片的背景，即 css 中的 background-image 属性。
+# https://developer.mozilla.org/zh-CN/docs/Web/CSS/background-image
+background = 'url("./Resources/Backgrounds/dirt.png")'
+
+[ai]
+# 是否启用 AI 功能。
+enabled = false
+
+# OpenAI 兼容格式的 BaseUrl 参数，若启用 AI 则必填。
+base_url = ""
+
+# 模型的名称。
+model_name = ""
+
+# OpenAI 兼容格式的 ApiKey，若启用 AI 则必填。
+api_key = ""
+
+# AI 的提示词，可以在此描述他的基本信息。
+system_prompt = "你是一个可爱的小女孩，乖巧可爱，听父母的话……"
+
+[auto_reply]
+# 是否启用自动回复功能。
+enabled = false
+
+# 自动回复的关键词以及回复内容。
+# 若有多个关键词，用逗号隔开；如果需要同时匹配多个关键词，用空格隔开。
+keywords = { "看群公告里的 IP 地址。" = ["服务器 在哪", "服务器", "服务器地址"] }
+
+[api]
+# 是否开启 API 服务器。
+enabled = false
+
+# API 服务器的 token，需附带在请求头中才可通过。
+token = "LonelySail123456"

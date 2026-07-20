@@ -1,9 +1,9 @@
 [project]
 name = "Minecraft_UniBot"
-version = "0.0.1"
+version = "v0.0.1"
 description = "一款与 Minecraft 互通的 Nonebot2 机器人。"
 readme = "README.md"
-requires-python = ">=3.10, <4.0"
+requires-python = ">=3.11, <4.0"
 dependencies = [
     "httpx>=0.28.1",
     "nonebot2[fastapi]>=2.2.1",
@@ -25,3 +25,11 @@ ai = [
 [[tool.uv.index]]
 url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple"
 default = true
+
+[tool.nonebot]
+adapters = [
+    { name = "OneBot V11", module_name = "nonebot.adapters.onebot.v11" },
+    { name = "Minecraft", module_name = "nonebot.adapters.minecraft" },
+]
+plugins = []
+plugin_dirs = ["Plugins"]

@@ -18,7 +18,7 @@ matcher = (
 
 @matcher.handle()
 async def handle():
-    if config.image_mode:
+    if config.image.mode:
         servers = [
             {'name': name, 'index': index}
             for index, name in enumerate(server_manager.servers.keys())

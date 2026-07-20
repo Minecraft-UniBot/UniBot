@@ -4,5 +4,5 @@ uuid_caches: dict[str, str] = {}
 
 render_template = None
 
-if config.image_mode:
+if config.image.mode:
     from .Render import render_template

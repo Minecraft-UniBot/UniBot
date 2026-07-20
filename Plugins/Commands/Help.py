@@ -19,7 +19,7 @@ matcher = (
 
 @matcher.handle()
 async def handle(command: Match[str]):
-    if config.image_mode:
+    if config.image.mode:
         if command.available:
             detail = get_command_detail(command.result)
             image = await render_template('Help', (600, 0), detail=detail, commands=None)

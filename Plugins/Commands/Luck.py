@@ -30,7 +30,7 @@ matcher = (
 @matcher.handle()
 async def handle(session: Uninfo):
     luck_data = get_luck_data(session)
-    if config.image_mode:
+    if config.image.mode:
         image = await render_template('Luck', (500, 0), **luck_data)
         await matcher.finish(UniMessage(Image(raw=image)))
     message = await turn_message_text(luck_handler(luck_data))

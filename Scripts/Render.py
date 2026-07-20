@@ -1,4 +1,3 @@
-
 import json
 import html
 import asyncio
@@ -54,7 +53,7 @@ async def render_template(template_name: str, size: tuple[int, int], **kwargs) -
     size: (width, height)
     """
     width, height = size
-    background = config.image_background or 'linear-gradient(150deg, #2e4a30 0%, #1d3524 55%, #12241a 100%)'
+    background = config.image.background or 'linear-gradient(150deg, #2e4a30 0%, #1d3524 55%, #12241a 100%)'
     context = dict(
         width=width, height=height,
         background=background,

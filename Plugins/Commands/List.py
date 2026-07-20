@@ -25,7 +25,7 @@ async def handle(server: Match[str]):
     flag, response = await get_players(server_flag)
     if flag is False:
         await matcher.finish(response)
-    if config.image_mode:
+    if config.image.mode:
         player_uuids = {}
         for players in response.values():
             for player in players[0]:
