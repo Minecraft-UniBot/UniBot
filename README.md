@@ -6,7 +6,7 @@
   <img src="https://img.shields.io/github/downloads/Minecraft-QQBot/BotServer/total" alt="下载量">
 </p>
 
-<h1 align="center">🧊 Minecraft QQ Bot</h1>
+<h1 align="center">🧊 Minecraft UniBot</h1>
 
 <p align="center">
   <b>跨平台 · 多服互联 · 即插即用 — 让 Minecraft 与你的聊天世界无缝相连</b>
@@ -33,20 +33,20 @@
 | **🤖 AI 智能对话** | 接入任意 OpenAI 兼容 API，@机器人即可与 AI 对话，支持上下文记忆 |
 | **🔐 白名单管理** | 完善的 QQ 与游戏 ID 绑定系统，支持多服白名单同步 |
 | **🎨 图片渲染模式** | 基于 HTML + CSS 模板引擎，将指令输出渲染为精美图片，支持自定义背景 |
-| **🐳 Docker 支持** | 一键部署，开箱即用 |
+<!-- | **🐳 Docker 支持** | 一键部署，开箱即用 | -->
 
 ---
 
-## 📖 使用方法
+## 📖 快速开始
 
 ### 前置要求
 
-- Python 3.10 ~ 3.12
+- Python 3.10 ~ 3.14
 - [UV](https://docs.astral.sh/uv/)（推荐，快速包管理器）或 pip
 - Minecraft Java 服务端（需安装 [鹊桥插件](https://github.com/17TheWord/MC_QQ_Spigot)）
 - 一个 QQ 机器人账号（或其他平台账号）
 
-### 🚀 快速安装与启动
+### 🚀 安装与启动
 
 #### 方式一：使用 UV（推荐）
 
@@ -71,7 +71,9 @@ cp .env.example .env
 uv run nb run
 ```
 
-> **为什么推荐 UV？** UV 比 pip 快 10-100 倍，自动解析依赖冲突，一条命令即可完成虚拟环境创建与依赖安装。
+> **为什么推荐 UV？**
+> UV 比 pip 快 10-100 倍，自动解析依赖冲突，一条命令即可完成虚拟环境创建与依赖安装。
+> [官方文档](https://uv.doczh.com/)
 
 #### 方式二：使用 pip + venv（传统方式）
 
@@ -90,12 +92,36 @@ pip install -e .
 pip install -e ".[image]"
 
 # 配置环境
-cp .env.example .env
-# vim .env
+vim .env
 
 # 启动
-nb run
+python3 Bot.py
 ```
+
+<!-- ### 🐳 Docker 部署
+
+#### Docker Compose（推荐）
+
+```bash
+git clone https://github.com/Minecraft-QQBot/UniBot
+cd UniBot
+# 编辑 .env 配置文件
+docker compose up -d
+```
+
+#### 自行构建
+
+```bash
+docker build -t minecraft-qqbot .
+docker run -d \
+  --name minecraft-qqbot \
+  -p 8000:8000 \
+  -v $(pwd)/.env:/app/.env \
+  -v $(pwd)/data:/app/data \
+  -v $(pwd)/Logs:/app/Logs \
+  --restart unless-stopped \
+  minecraft-qqbot
+``` -->
 
 ### ⚙️ 配置说明
 
@@ -115,17 +141,6 @@ MINECRAFT_WS_URLS={"server1": ["ws://你的IP:端口/路径"]}
 ```
 
 > 📖 完整配置项说明请参阅 `.env` 文件内注释。
-
-### 🐳 Docker 部署
-
-```bash
-git clone https://github.com/Minecraft-QQBot/BotServer
-cd BotServer
-# 编辑 .env 配置文件
-docker compose up -d
-```
-
----
 
 ## 🎯 功能一览
 
@@ -198,10 +213,9 @@ IMAGE_BACKGROUND=linear-gradient(150deg, #2e4a30 0%, #1d3524 55%, #12241a 100%)
 
 ## 🏗️ 架构设计
 
-```
+```txt
 BotServer
 ├── nonebot2 核心                    ← 异步事件驱动框架
-├── nonebot-adapter-onebot          ← QQ 平台接入
 ├── nonebot-adapter-minecraft       ← Minecraft WebSocket 通信
 ├── nonebot-plugin-alconna          ← 跨平台命令解析
 ├── nonebot-plugin-uninfo           ← 统一会话信息
@@ -274,136 +288,6 @@ flowchart TB
 
 > Minecraft 服务端需安装 [鹊桥（QueQiao）](https://github.com/17TheWord/MC_QQ_Spigot) 插件/模组来建立连接。
 
----
-
-## 🚀 快速开始
-
-### 前置要求
-
-- Python 3.10 ~ 3.12
-- 一个 Minecraft Java 服务端（需安装鹊桥插件）
-- 一个 QQ 机器人账号（或其他平台账号）
-
-### 1️⃣ 克隆项目
-
-```bash
-git clone https://github.com/Minecraft-QQBot/BotServer
-cd BotServer
-```
-
-### 2️⃣ 安装依赖
-
-```bash
-pip install -e .
-```
-
-> 推荐使用 [uv](https://docs.astral.sh/uv/) 或 venv 创建虚拟环境。
-
-### 3️⃣ 配置环境
-
-复制 `.env.example` 为 `.env`，按需修改：
-
-```ini
-SUPERUSERS=["你的QQ号"]
-
-# QQ 群列表
-MESSAGE_GROUPS=["qq:123456789"]
-
-# Minecraft 服务器 WebSocket 地址
-MINECRAFT_WS_URLS={"server1": ["ws://你的服务器IP:端口/路径"]}
-
-# 可选：AI 对话
-AI_ENABLED=true
-AI_API_KEY="sk-xxxx"
-AI_BASE_URL="https://api.openai.com/v1"
-```
-
-### 4️⃣ 安装鹊桥插件
-
-在 Minecraft 服务端安装 [鹊桥（QueQiao）](https://github.com/17TheWord/MC_QQ_Spigot)，配置连接地址指向机器人。
-
-### 5️⃣ 启动！
-
-```bash
-nb run
-```
-
----
-
-## 🐳 Docker 部署
-
-### Docker Compose（推荐）
-
-```bash
-git clone https://github.com/Minecraft-QQBot/BotServer
-cd BotServer
-# 编辑 .env 配置文件
-docker compose up -d
-```
-
-### 自行构建
-
-```bash
-docker build -t minecraft-qqbot .
-docker run -d \
-  --name minecraft-qqbot \
-  -p 8000:8000 \
-  -v $(pwd)/.env:/app/.env \
-  -v $(pwd)/data:/app/data \
-  -v $(pwd)/Logs:/app/Logs \
-  --restart unless-stopped \
-  minecraft-qqbot
-```
-
----
-
-## ⚙️ 配置参考
-
-### 核心配置
-
-| 配置项 | 说明 | 默认值 |
-|--------|------|--------|
-| `SUPERUSERS` | 管理员 QQ 号列表 | `[]` |
-| `MESSAGE_GROUPS` | 消息推送的群组列表 | `[]` |
-| `MINECRAFT_WS_URLS` | Minecraft 服务器 WebSocket 地址 | `{}` |
-| `COMMAND_START` | 指令前缀 | `["."]` |
-| `COMMAND_ENABLED` | 启用的指令列表 | `[]`（默认全部启用） |
-
-### 图片渲染
-
-| 配置项 | 说明 | 默认值 |
-|--------|------|--------|
-| `IMAGE_MODE` | 是否启用图片渲染模式 | `false` |
-| `IMAGE_BACKGROUND` | 图片背景（CSS background-image 值） | 渐变色 |
-
-### 消息同步
-
-| 配置项 | 说明 | 默认值 |
-|--------|------|--------|
-| `BROADCAST_SERVER` | 播报服务器启停 | `true` |
-| `BROADCAST_PLAYER` | 播报玩家进出/死亡 | `true` |
-| `SYNC_ALL_QQ_MESSAGE` | 同步所有 QQ 群消息到游戏 | `true` |
-| `SYNC_MESSAGE_BETWEEN_SERVERS` | 服务器间消息互转 | `true` |
-| `SYNC_SENSITIVE_WORDS` | 敏感词过滤列表 | `[]` |
-
-### 更多配置
-
-> 📖 完整配置项请参阅 [在线文档](https://mcbot.ytb.icu/)
-
----
-
-## 📸 截图预览
-
-| QQ 群内 | 游戏内 |
-|---------|--------|
-| 查看在线玩家 | 收到 QQ 群消息 |
-| AI 智能对话 | 玩家进出通知 |
-| 每日运势 | 跨服消息广播 |
-
-> 更多截图请访问 [项目文档](https://mcbot.ytb.icu/)
-
----
-
 ## 🧪 对比同类方案
 
 | 特性 | **Minecraft QQ Bot** | 传统方案 |
@@ -453,5 +337,5 @@ docker run -d \
 ---
 
 <p align="center">
-  Made with ❤️ by Minecraft-QQBot Team
+  Made with ❤️ by LonelySail
 </p>
