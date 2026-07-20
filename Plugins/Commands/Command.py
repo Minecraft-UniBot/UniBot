@@ -9,8 +9,10 @@ from Scripts.Utils import turn_message_text, get_permission
 
 logger.debug('加载命令 Command 完毕！')
 
-# 使用 Args 接收不定长参数，command 部分作为一个整体
-matcher = Command('command <server:str> <command:str+>').build(rule=command_group_rule, use_cmd_start=True)
+matcher = (
+    Command('command <server#服务器名称:str> <command#要执行的命令:str+>', '向指定服务器发送控制台命令。')
+    .build(rule=command_group_rule, use_cmd_start=True)
+)
 
 
 @matcher.handle()

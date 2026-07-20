@@ -11,11 +11,11 @@ from Scripts.Rules import command_group_rule
 logger.debug('加载命令 Bound 完毕！')
 
 matcher = (
-    Command('bound <player?:str>')
-    .subcommand('list')
-    .subcommand('query <user_id?:At|str>')
-    .subcommand('remove <player:At|str>')
-    .subcommand('append <user_id:At|str> <player:str>')
+    Command('bound <player?#要绑定的玩家名:str>', '管理玩家白名单绑定。')
+    .subcommand('list #列出所有绑定')
+    .subcommand('query <user_id?:At|str> #查询指定用户的绑定')
+    .subcommand('remove <player:At|str> #移除指定绑定')
+    .subcommand('append <user_id:At|str> <player:str> #为指定用户添加绑定')
     .build(rule=command_group_rule, use_cmd_start=True)
 )
 

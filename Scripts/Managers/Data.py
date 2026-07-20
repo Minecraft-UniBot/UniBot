@@ -9,7 +9,6 @@ from ..Config import config
 
 class DataManager:
     players: dict = {}
-    commands: dict = {}
 
     data_dir = Path('Data')
     resources_dir = Path('Resources')
@@ -33,7 +32,6 @@ class DataManager:
 
     def load_bot_data(self):
         logger.debug('正在加载机器人数据……')
-        self.commands = loads((self.resources_dir / 'Commands.json').read_text('Utf-8'))
         logger.success('加载机器人数据完毕！')
 
     async def save(self):

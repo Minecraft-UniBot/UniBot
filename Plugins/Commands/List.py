@@ -4,7 +4,7 @@ from nonebot.adapters.minecraft import Bot as Server
 from nonebot_plugin_alconna import Command, Match
 
 from Scripts.Config import config
-from Scripts.Globals import render_template
+# from Scripts.Globals import render_template
 from Scripts.Managers import server_manager
 from Scripts.Network import get_player_uuid
 from Scripts.Utils import turn_message_text
@@ -12,7 +12,10 @@ from Scripts.Rules import command_group_rule
 
 logger.debug('加载命令 List 完毕！')
 
-matcher = Command('list <server?:str>').build(rule=command_group_rule, use_cmd_start=True)
+matcher = (
+    Command('list <server?#服务器名称:str>', '查看服务器在线玩家列表。')
+    .build(rule=command_group_rule, use_cmd_start=True)
+)
 
 
 @matcher.handle()
@@ -24,7 +27,7 @@ async def handle(server: Match[str]):
     if config.image_mode:
         player_uuids = {}
         for players in response.values():
-            for player in players[0]:       
+            for player in players[0]:
                 player_uuids[player] = await get_player_uuid(player)
         image = await render_template('List.html', (700, 1000), player_list=response, uuids=player_uuids)
         await matcher.finish(image)

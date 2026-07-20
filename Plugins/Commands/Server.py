@@ -7,8 +7,10 @@ from Scripts.Rules import command_group_rule
 
 logger.debug('加载命令 Server 完毕！')
 
-# 使用 Args 接收不定长参数，command 部分作为一个整体
-matcher = Command('server').build(rule=command_group_rule, use_cmd_start=True)
+matcher = (
+    Command('server', '查看已连接的服务器列表。')
+    .build(rule=command_group_rule, use_cmd_start=True)
+)
 
 
 @matcher.handle()

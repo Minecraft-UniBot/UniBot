@@ -18,7 +18,10 @@ good_things = (
 
 logger.debug('加载命令 Luck 完毕！')
 
-matcher = Command('luck').build(rule=command_group_rule, use_cmd_start=True)
+matcher = (
+    Command('luck', '查看今日人品值。')
+    .build(rule=command_group_rule, use_cmd_start=True)
+)
 
 
 @matcher.handle()

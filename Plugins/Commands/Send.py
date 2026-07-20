@@ -8,7 +8,10 @@ from Scripts.Rules import command_group_rule
 
 logger.debug('加载命令 Send 完毕！')
 
-matcher = Command('send <message:str+>').build(rule=command_group_rule, use_cmd_start=True)
+matcher = (
+    Command('send <message#要发送的消息内容:str+>', '向已连接的服务器发送消息。')
+    .build(rule=command_group_rule, use_cmd_start=True)
+)
 
 
 @matcher.handle()

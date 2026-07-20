@@ -7,7 +7,10 @@ from Scripts.Rules import command_group_rule
 
 logger.debug('加载命令 About 完毕！')
 
-matcher = Command('about').build(rule=command_group_rule, use_cmd_start=True)
+matcher = (
+    Command('about', '查看关于信息。')
+    .build(rule=command_group_rule, use_cmd_start=True)
+)
 
 
 @matcher.handle()
