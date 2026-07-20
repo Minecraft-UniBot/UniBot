@@ -32,7 +32,7 @@
 | **🧩 模块化架构** | 指令按插件拆分，Alconna 命令解析器驱动，扩展新功能就像搭积木 |
 | **🤖 AI 智能对话** | 接入任意 OpenAI 兼容 API，@机器人即可与 AI 对话，支持上下文记忆 |
 | **🔐 白名单管理** | 完善的 QQ 与游戏 ID 绑定系统，支持多服白名单同步 |
-| **🎨 图片渲染模式** | 支持以图片形式展示信息，美观大方 |
+| **🎨 图片渲染模式** | 基于 HTML + CSS 模板引擎，将指令输出渲染为精美图片，支持自定义背景 |
 | **🐳 Docker 支持** | 一键部署，开箱即用 |
 
 ---
@@ -58,6 +58,9 @@ cd BotServer
 # 创建虚拟环境并安装依赖（UV 自动管理）
 uv sync
 
+# 如需启用图片渲染模式，额外安装 image 依赖
+uv sync --extra image
+
 # 复制环境配置模板
 cp .env.example .env
 
@@ -68,7 +71,7 @@ cp .env.example .env
 uv run nb run
 ```
 
-> **为什么推荐 UV？** UV 比 pip 快 10-100 倍，自动解析依赖冲突，支持锁定文件（`uv.lock`）确保环境一致，一条命令即可完成虚拟环境创建与依赖安装。
+> **为什么推荐 UV？** UV 比 pip 快 10-100 倍，自动解析依赖冲突，一条命令即可完成虚拟环境创建与依赖安装。
 
 #### 方式二：使用 pip + venv（传统方式）
 
@@ -82,6 +85,9 @@ source .venv/bin/activate
 
 # 安装依赖
 pip install -e .
+
+# 如需启用图片渲染模式，额外安装 image 依赖
+pip install -e ".[image]"
 
 # 配置环境
 cp .env.example .env
@@ -104,6 +110,8 @@ MESSAGE_GROUPS=["qq:123456789"]
 
 # Minecraft 服务器 WebSocket 地址（支持多服）
 MINECRAFT_WS_URLS={"server1": ["ws://你的IP:端口/路径"]}
+
+…………
 ```
 
 > 📖 完整配置项说明请参阅 `.env` 文件内注释。
@@ -143,6 +151,35 @@ docker compose up -d
 | `/about` | 关于本机器人 |
 
 > 💡 所有指令均基于 [Alconna](https://github.com/ArcletProject/Alconna) 解析，跨平台表现一致。
+
+### 🎨 图片渲染模式
+
+启用 `IMAGE_MODE` 后，机器人的指令输出将以 **图片** 形式发送，而非纯文本。渲染引擎基于 HTML + CSS 模板（Jinja2 + html2pic），效果美观且高度可定制。
+
+**支持图片渲染的指令：**
+
+| 指令 | 渲染内容 |
+|------|----------|
+| `/list` | 在线玩家列表（含玩家头像） |
+| `/server` | 服务器连接状态 |
+| `/luck` | 每日运势卡片 |
+| `/bound` | 白名单绑定信息 |
+| `/help` | 帮助信息 |
+| `/about` | 关于页面 |
+
+**自定义背景：**
+
+通过 `IMAGE_BACKGROUND` 配置项设置图片背景，值为 CSS `background-image` 属性值：
+
+```ini
+# 使用本地图片
+IMAGE_BACKGROUND=url("./Resources/Backgrounds/dirt.png")
+
+# 使用渐变色
+IMAGE_BACKGROUND=linear-gradient(150deg, #2e4a30 0%, #1d3524 55%, #12241a 100%)
+```
+
+> ⚠️ 图片模式会略微增加响应时间（需渲染 HTML 并转换为图片）。模板文件位于 `Resources/Images/` 目录，可自行修改 HTML/CSS 定制样式。
 
 ### 智能扩展
 
@@ -331,6 +368,13 @@ docker run -d \
 | `MINECRAFT_WS_URLS` | Minecraft 服务器 WebSocket 地址 | `{}` |
 | `COMMAND_START` | 指令前缀 | `["."]` |
 | `COMMAND_ENABLED` | 启用的指令列表 | `[]`（默认全部启用） |
+
+### 图片渲染
+
+| 配置项 | 说明 | 默认值 |
+|--------|------|--------|
+| `IMAGE_MODE` | 是否启用图片渲染模式 | `false` |
+| `IMAGE_BACKGROUND` | 图片背景（CSS background-image 值） | 渐变色 |
 
 ### 消息同步
 
