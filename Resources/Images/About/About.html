@@ -6,14 +6,27 @@
     <div class="subtitle">ABOUT MINECRAFT-UNIBOT</div>
 </div>
 <div class="title-bar"></div>
+<div class="about-version-card">
+    <div class="about-version-info">
+        <div class="about-label">当前版本</div>
+        <div class="about-version">{{ version }}</div>
+    </div>
+    <div class="about-status {{ 'status-new' if has_update else 'status-latest' }}">{{ '发现新版本，请及时更新！' if has_update else '已是最新版本！' }}</div>
+</div>
 <div class="about-card">
     <div class="about-row">
-        <span class="about-label">当前版本</span>
-        <span class="about-value">{{ version }}</span>
+        <span class="about-label">项目官网</span>
+        <span class="about-link">https://qqbot.bugjump.xyz/</span>
     </div>
+    <div class="about-divider"></div>
     <div class="about-row">
-        <span class="about-label">版本状态</span>
-        <span class="about-status {{ 'status-new' if has_update else 'status-latest' }}">{{ '发现新版本，请及时更新！' if has_update else '已是最新版本！' }}</span>
+        <span class="about-label">项目地址</span>
+        <span class="about-link">https://github.com/Minecraft-QQBot</span>
     </div>
+</div>
+<div class="about-footer">
+    <div class="about-footer-title">欢迎加入 QQ 交流群</div>
+    <div class="about-group">962802248</div>
+    <div class="about-footer-note">对这个项目感兴趣不妨点个 Star 吧！</div>
 </div>
 {% endblock %}

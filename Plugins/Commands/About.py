@@ -19,7 +19,7 @@ matcher = (
 @matcher.handle()
 async def handle():
     if config.image_mode:
-        image = await render_template('About', (600, 0),
+        image = await render_template('About', (500, 0),
                                       version=version_manager.version,
                                       has_update=version_manager.check_update())
         await matcher.finish(UniMessage(Image(raw=image)))

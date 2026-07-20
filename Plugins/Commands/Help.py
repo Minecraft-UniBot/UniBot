@@ -22,10 +22,10 @@ async def handle(command: Match[str]):
     if config.image_mode:
         if command.available:
             detail = get_command_detail(command.result)
-            image = await render_template('Help', (600, 800), detail=detail, commands=None)
+            image = await render_template('Help', (600, 0), detail=detail, commands=None)
         else:
             commands = get_commands_list()
-            image = await render_template('Help', (600, 800), detail=None, commands=commands)
+            image = await render_template('Help', (600, 0), detail=None, commands=commands)
         await matcher.finish(UniMessage(Image(raw=image)))
     if command.available:
         message = await turn_message_text(detailed_handler(command.result))

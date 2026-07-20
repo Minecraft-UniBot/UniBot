@@ -1,3 +1,6 @@
+
+import json
+import html
 import asyncio
 from io import BytesIO
 from pathlib import Path
@@ -27,6 +30,11 @@ def render(html: str, css: str) -> bytes:
     return buffer.getvalue()
 
 
+def encode_context(context: dict) -> dict:
+    string = json.dumps(context)
+    return json.loads(html.escape(string, False))
+
+
 async def load_style(name: str, **context) -> str:
     """加载 base.css + 模板专属 css，并通过 Jinja2 异步渲染"""
     parts = []
@@ -51,12 +59,12 @@ async def render_template(template_name: str, size: tuple[int, int], **kwargs) -
         width=width, height=height,
         background=background,
         font_uri=str(FONT_PATH),
-        **kwargs,
+        **encode_context(kwargs),
     )
     template = environment.get_template(f'{template_name}/{template_name}.html')
     html_content, css_content = await asyncio.gather(
         template.render_async(**context),
         load_style(template_name, **context),
     )
-
+    logger.debug(f'渲染图片：{html_content}\n{css_content}')
     return await asyncio.to_thread(render, html_content, css_content)

@@ -1,32 +1,31 @@
-/* ===== 版本信息 ===== */
-.about-card {
+/* ===== 版本卡片 ===== */
+.about-version-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     margin-top: 24px;
-    padding: 20px;
+    padding: 18px 22px;
     border-radius: 5px;
     background-color: rgba(0, 0, 0, 0.3);
     border: 2px solid rgba(255, 255, 255, 0.1);
 }
 
-.about-row {
+.about-version-info {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 8px 0;
+    flex-direction: column;
 }
 
-.about-label {
-    font-size: 15px;
-    color: rgba(255, 255, 255, 0.6);
-}
-
-.about-value {
-    font-size: 15px;
-    color: #ffffff;
+.about-version {
+    margin-top: 6px;
+    font-size: 34px;
+    font-weight: bold;
+    color: #a5d96a;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
 }
 
 .about-status {
-    font-size: 14px;
-    padding: 3px 10px;
+    font-size: 13px;
+    padding: 4px 12px;
     border-radius: 4px;
 }
 
@@ -40,6 +39,68 @@
     color: #f0c040;
     background-color: rgba(240, 192, 64, 0.15);
     border: 1px solid rgba(240, 192, 64, 0.4);
+}
+
+/* ===== 链接卡片 ===== */
+.about-card {
+    margin-top: 16px;
+    padding: 6px 22px;
+    border-radius: 5px;
+    background-color: rgba(0, 0, 0, 0.3);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.about-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 13px 0;
+}
+
+.about-label {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.about-link {
+    font-size: 14px;
+    color: #ffffff;
+}
+
+.about-divider {
+    height: 1px;
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+/* ===== 底部信息 ===== */
+.about-footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 16px;
+    padding: 18px 20px;
+    border-radius: 5px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border: 1px dashed rgba(255, 255, 255, 0.18);
+}
+
+.about-footer-title {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.about-group {
+    margin-top: 8px;
+    font-size: 28px;
+    font-weight: bold;
+    color: #a5d96a;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+}
+
+.about-footer-note {
+    margin-top: 10px;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.45);
 }
 
 
