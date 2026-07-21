@@ -1,3 +1,4 @@
+import asyncio
 from datetime import datetime, timedelta, timezone
 
 import jwt
@@ -21,6 +22,9 @@ REFRESH_TOKEN_EXPIRE_DAYS = 7
 
 # 已注销的 refresh_token 集合
 revoked_tokens: set[str] = set()
+
+# 初始化接口并发锁：防止「检测无用户 → 创建用户」之间被并发请求插入
+setup_lock = asyncio.Lock()
 
 
 def create_access_token(user_id: str, role: str) -> str:
@@ -72,12 +76,19 @@ def require_role(*roles: str):
     return checker
 
 
+@router.get('/status', summary='获取认证状态')
+async def auth_status():
+    '''返回系统是否已初始化（无需认证），供登录页决定是否展示初始化入口'''
+    return {'code': 0, 'data': {'initialized': data_manager.is_initialized}, 'message': 'ok'}
+
+
 @router.post('/setup', summary='首次初始化')
 async def setup(body: SetupRequest):
     '''首次初始化：创建管理员账户，仅在无任何用户时可用'''
-    if data_manager.is_initialized:
-        return {'code': 1, 'data': None, 'message': '系统已初始化'}
-    user_info = await data_manager.create_user(body.username, body.password, body.nickname, role='admin')
+    async with setup_lock:
+        if data_manager.is_initialized:
+            return {'code': 1, 'data': None, 'message': '系统已初始化，禁止重复创建管理员账户'}
+        user_info = await data_manager.create_user(body.username, body.password, body.nickname, role='admin')
     logger.success(f'WebUI 管理员账户 [{body.username}] 创建成功！')
     return {'code': 0, 'data': {'user_id': user_info['user_id']}, 'message': '初始化成功'}
 

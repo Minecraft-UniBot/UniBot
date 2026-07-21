@@ -11,5 +11,6 @@ uv.lock
 
 Data/
 Logs/
+WebUi/
 .**/
 .**.md

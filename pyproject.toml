@@ -1,6 +1,6 @@
 [project]
 name = "Minecraft_UniBot"
-version = "v0.0.1"
+version = "v0.0.1-pre"
 description = "一款与 Minecraft 互通的 Nonebot2 机器人。"
 readme = "README.md"
 requires-python = ">=3.11, <4.0"
@@ -31,7 +31,7 @@ ai = [
 
 [unibot]
 # 此版本对应的 WebUi 版本
-webui_version = 'v0.0.1-test'
+webui_version = 'v0.0.1-pre'
 
 [[tool.uv.index]]
 url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple"
