@@ -76,6 +76,11 @@ server_memory_update_interval = 5
 # 超过这个时间的服务器信息将会被删除。
 server_memory_max_cache = 200
 
+[webui]
+# 是否启用 WebUI 管理面板。
+# 启用后将在机器人端口上挂载 Web API 与 WebSocket，配合 WebUi 前端使用。
+enabled = true
+
 [image]
 # 是否启用图片模式。
 # 启用后机器人将会把所发送的消息渲染为图片，但需额外配置，且响应速度会变慢。
@@ -100,11 +105,6 @@ api_key = ""
 
 # AI 的提示词，可以在此描述他的基本信息。
 system_prompt = "你是一个可爱的小女孩，乖巧可爱，听父母的话……"
-
-[webui]
-# 是否启用 WebUI 管理面板。
-# 启用后将在机器人端口上挂载 Web API 与 WebSocket，配合 WebUi 前端使用。
-enabled = true
 
 [auto_reply]
 # 是否启用自动回复功能。

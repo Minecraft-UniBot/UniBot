@@ -9,7 +9,7 @@ driver = nonebot.get_driver()
 
 def main():
     from Scripts.Config import config as bot_config
-    from Scripts.Managers.Environment import environment_manager
+    from Scripts.Managers import environment_manager, webui_manager
     
     # 提前加载 .env 和 pyproject.toml 配置（适配器注册、插件加载需要）
     environment_manager.init()
@@ -25,15 +25,7 @@ def main():
     # 挂载 WebUI API 路由（需在 nonebot.init() 之后、nonebot.run() 之前）
 
     if bot_config.webui.enabled:
-        from fastapi import FastAPI
-        from Scripts.Api import api_router, setup_cors
-        from Scripts.Api.Ws import log_sink
-
-        app: FastAPI = nonebot.get_app()
-        setup_cors(app)
-        app.include_router(api_router)
-        logger.add(log_sink, level='DEBUG', format='{time:HH:mm:ss} | {level} | {message}')
-        logger.success('WebUI API 路由挂载完毕！')
+        webui_manager.mount(nonebot.get_app())
     
     log_path = Path('./Logs/')
     if not log_path.exists():
@@ -45,12 +37,16 @@ def main():
 
 @driver.on_startup
 async def startup():
-    from Scripts.Managers import version_manager, server_manager, data_manager, plugin_manager, environment_manager
+    from Scripts.Config import config as bot_config
+    from Scripts.Managers import version_manager, server_manager, data_manager, plugin_manager, webui_manager
 
     await version_manager.init()
     server_manager.init()
     data_manager.load()
     plugin_manager.load()
+
+    if bot_config.webui.enabled:
+        await webui_manager.init()
 
 
 @driver.on_shutdown

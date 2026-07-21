@@ -7,6 +7,14 @@ from Scripts.Globals import uuid_caches
 
 client = AsyncClient()
 
+# GitHub 加速镜像列表（依次尝试，全部失败后回退到原始地址直连）
+GITHUB_MIRRORS = [
+    'https://ghproxy.net/',
+    'https://gh-proxy.com/',
+    'https://ghfast.top/',
+    'https://ghproxy.cc/',
+]
+
 
 async def request(url: str):
     try:
@@ -29,13 +37,22 @@ async def get_player_uuid(name: str):
 
 
 async def download(url: str):
-    download_bytes = BytesIO()
+    '''下载文件，GitHub 地址会依次尝试加速镜像，全部失败后回退到原始地址直连'''
+    candidate_urls = []
     if 'github' in url:
-        url = 'https://mirror.ghproxy.com/' + url
-    async with client.stream('GET', url) as stream:
-        if stream.status_code != 200:
-            return False
-        async for chunk in stream.aiter_bytes():
-            download_bytes.write(chunk)
-        download_bytes.seek(0)
-        return download_bytes
+        candidate_urls = [mirror + url for mirror in GITHUB_MIRRORS]
+    candidate_urls.append(url)
+    for candidate_url in candidate_urls:
+        try:
+            download_bytes = BytesIO()
+            async with client.stream('GET', candidate_url) as stream:
+                if stream.status_code != 200:
+                    logger.warning(f'下载 {candidate_url} 失败：错误的状态代码 {stream.status_code}')
+                    continue
+                async for chunk in stream.aiter_bytes():
+                    download_bytes.write(chunk)
+            download_bytes.seek(0)
+            return download_bytes
+        except Exception as error:
+            logger.warning(f'下载 {candidate_url} 失败：{error}')
+    return False
