@@ -84,7 +84,7 @@ enabled = true
 [image]
 # 是否启用图片模式。
 # 启用后机器人将会把所发送的消息渲染为图片，但需额外配置，且响应速度会变慢。
-mode = true
+mode = false
 
 # 生成图片的背景，即 css 中的 background-image 属性。
 # https://developer.mozilla.org/zh-CN/docs/Web/CSS/background-image
