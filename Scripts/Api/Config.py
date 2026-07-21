@@ -1,10 +1,10 @@
 from copy import deepcopy
 
-import tomli_w
+import tomlkit
 from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel
 
-from Scripts.Config import TOML_PATH, config
+from Scripts.Config import TOML_PATH, Config, config
 from Scripts.Managers import environment_manager
 from .Auth import get_current_user, require_role
 
@@ -110,7 +110,7 @@ async def patch_config(request: Request, current_user: dict = Depends(require_ro
     for key in ('port', 'superusers', 'command_start'):
         toml_output.pop(key, None)
 
-    # tomli_w 不支持 None 值，替换为空字符串
+    # tomlkit 不支持 None 值，替换为空字符串
     def sanitize_none(data: dict) -> dict:
         result = {}
         for key, value in data.items():
@@ -123,15 +123,31 @@ async def patch_config(request: Request, current_user: dict = Depends(require_ro
         return result
 
     try:
-        with open(TOML_PATH, 'wb') as file:
-            tomli_w.dump(sanitize_none(toml_output), file)
+        # 读取现有文件以保留注释和格式
+        try:
+            with open(TOML_PATH, 'r', encoding='utf-8') as file:
+                toml_document = tomlkit.parse(file.read())
+        except FileNotFoundError:
+            toml_document = tomlkit.document()
+
+        # 逐键更新，保留原有注释
+        sanitized = sanitize_none(toml_output)
+        for key, value in sanitized.items():
+            if isinstance(value, dict) and key in toml_document and isinstance(toml_document[key], dict):
+                for sub_key, sub_value in value.items():
+                    toml_document[key][sub_key] = sub_value
+            else:
+                toml_document[key] = value
+
+        with open(TOML_PATH, 'w', encoding='utf-8') as file:
+            file.write(tomlkit.dumps(toml_document))
     except Exception as error:
         return {'code': 500, 'data': None, 'message': f'写入配置文件失败：{error}'}
 
-    # 热更新内存中的配置对象
-    for key, value in merged_data.items():
-        if hasattr(config, key):
-            setattr(config, key, value)
+    # 热更新内存中的配置对象（先经模型校验，保证嵌套配置仍为 Pydantic 子模型而非 dict）
+    updated_config = Config.model_validate(merged_data)
+    for field_name in Config.model_fields:
+        setattr(config, field_name, getattr(updated_config, field_name))
 
     return {'code': 0, 'data': None, 'message': 'ok'}
 

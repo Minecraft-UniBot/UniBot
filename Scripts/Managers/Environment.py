@@ -1,7 +1,7 @@
 import sys
-import tomllib
-from json import JSONDecodeError, loads, dumps
+import tomlkit
 from pathlib import Path
+from json import JSONDecodeError, loads, dumps
 
 from nonebot.log import logger
 
@@ -15,6 +15,7 @@ class EnvironmentManager:
 
     # pyproject.toml 数据
     version: str = ''
+    webui_version: str = ''
     nonebot_config: dict = {}
 
     def init(self):
@@ -48,9 +49,10 @@ class EnvironmentManager:
         if not self.pyproject_path.exists():
             logger.error('没有找到 pyproject.toml！请重新下载后重试。')
             sys.exit(1)
-        with self.pyproject_path.open('rb') as file:
-            data = tomllib.load(file)
+        with self.pyproject_path.open('r', encoding='utf-8') as file:
+            data = tomlkit.parse(file.read())
         self.version = data.get('project', {}).get('version', '')
+        self.webui_version = data.get('unibot', {}).get('webui_version', '')
         self.nonebot_config = data.get('tool', {}).get('nonebot', {})
         logger.success('加载 pyproject.toml 完毕！')
 
@@ -84,15 +86,14 @@ class EnvironmentManager:
     # ===== pyproject.toml 操作 =====
 
     def read_pyproject(self) -> dict:
-        '''读取 pyproject.toml 完整内容'''
-        with self.pyproject_path.open('rb') as file:
-            return tomllib.load(file)
+        '''读取 pyproject.toml 完整内容（保留注释和格式）'''
+        with self.pyproject_path.open('r', encoding='utf-8') as file:
+            return tomlkit.parse(file.read())
 
     def write_pyproject(self, data: dict):
-        '''写回 pyproject.toml'''
-        import tomli_w
-        with self.pyproject_path.open('wb') as file:
-            tomli_w.dump(data, file)
+        '''写回 pyproject.toml（保留注释和格式）'''
+        with self.pyproject_path.open('w', encoding='utf-8') as file:
+            file.write(tomlkit.dumps(data))
 
     def add_adapter(self, name: str, module_name: str) -> bool:
         '''添加适配器，返回是否成功（False 表示已存在）'''

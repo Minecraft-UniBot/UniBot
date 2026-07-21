@@ -10,10 +10,6 @@ dependencies = [
     "nonebot-adapter-minecraft>=1.8.1",
     "nonebot-plugin-alconna>=0.62.0",
     "nonebot-plugin-uninfo>=0.11.0",
-    "psutil>=6.0.0",
-    "tomli-w>=1.0.0",
-    "PyJWT>=2.8.0",
-    "bcrypt>=4.0.0",
 ]
 
 [project.optional-dependencies]
@@ -22,9 +18,19 @@ image = [
     "jinja2>=3.1.6",
     "pillow>=12.0.0",
 ]
+webui = [
+    "psutil>=6.0.0",
+    "tomlkit>=0.13.0",
+    "PyJWT>=2.8.0",
+    "bcrypt>=4.0.0",
+]
 ai = [
     "openai>=2.46.0",
 ]
+
+[unibot]
+# 此版本对应的 WebUi 版本
+webui_version = 'v0.0.1-test'
 
 [[tool.uv.index]]
 url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple"

@@ -30,7 +30,7 @@ async def get_status(current_user: dict = Depends(get_current_user)):
             'servers_total': len(servers),
             'players_bound': len(data_manager.players),
             'adapters': adapter_names,
-            'webui_enabled': config.webui.enabled,
+            'webui_enabled': config.webui.get('enabled', False) if isinstance(config.webui, dict) else config.webui.enabled,
             'ws_clients': len(ws_clients),
         },
         'message': 'ok',

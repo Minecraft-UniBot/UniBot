@@ -1,6 +1,6 @@
 from pathlib import Path
-from tomllib import load
 
+import tomlkit
 from nonebot import get_plugin_config
 from pydantic import BaseModel, model_validator
 
@@ -82,8 +82,8 @@ class Config(BaseModel):
         return self
 
 
-with open(TOML_PATH, 'rb') as f:
-    toml_data = load(f)
+with open(TOML_PATH, 'r', encoding='utf-8') as f:
+    toml_data = tomlkit.parse(f.read())
 
 merged = get_plugin_config(Config).model_dump()
 merged.update(toml_data)
