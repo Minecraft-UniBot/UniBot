@@ -12,3 +12,4 @@ uv.lock
 Data/
 Logs/
 .**/
+.**.md

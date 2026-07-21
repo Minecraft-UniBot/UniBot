@@ -1,10 +1,6 @@
-import tomllib
-from pathlib import Path
-from zipfile import ZipFile
-
 from nonebot.log import logger
 
-from ..Network import download, request
+from .Environment import environment_manager
 
 
 class VersionManager:
@@ -17,9 +13,7 @@ class VersionManager:
         return self.latest_version != self.version
 
     async def init(self):
-        project_file = Path('pyproject.toml')
-        project_data = tomllib.loads(project_file.read_text())
-        self.version = project_data['project']['version']
+        self.version = environment_manager.version
         logger.info(f'监测到当前为 {self.version} 版本。')
         logger.warning('版本检查服务器G了，作者挖坑不填，捞B')
 

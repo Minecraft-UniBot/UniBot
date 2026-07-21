@@ -5,7 +5,7 @@ import jwt
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from nonebot.log import logger
 
-from Scripts.Managers import user_manager
+from Scripts.Managers import data_manager
 
 router = APIRouter(tags=['WebSocket'])
 
@@ -53,7 +53,7 @@ async def websocket_endpoint(websocket: WebSocket):
         await websocket.close(code=4001, reason='Unauthorized')
         return
     try:
-        payload = jwt.decode(token, user_manager.secret_key, algorithms=['HS256'])
+        payload = jwt.decode(token, data_manager.secret_key, algorithms=['HS256'])
         if payload.get('type') != 'access':
             raise jwt.InvalidTokenError()
     except jwt.InvalidTokenError:

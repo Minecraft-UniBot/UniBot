@@ -19,9 +19,11 @@ command_enabled = ["list", "luck", "server", "help", "bound", "command", "send"]
 # 指令群，机器人只对这些群的指令作响应。
 # 格式 "{平台}:{群ID}"，平台对应：
 #   qq_client / qq_guild / qq_api / telegram / discord / dodo / kook / wechat / wecom / onebot12_other / satori_other
+# 请将 123456789 替换为你的实际群号。
 command_groups = ["qq_client:123456789"]
 
 # 消息群（即使用指令发送到消息的 QQ 群，以及把群内消息同步到游戏内的群）。
+# 请将 123456789 替换为你的实际群号。
 message_groups = ["qq_client:123456789"]
 
 # Command 指令的白名单，只有以这个列表里的指令开头的指令才被允许执行。
@@ -77,7 +79,7 @@ server_memory_max_cache = 200
 [image]
 # 是否启用图片模式。
 # 启用后机器人将会把所发送的消息渲染为图片，但需额外配置，且响应速度会变慢。
-mode = false
+mode = true
 
 # 生成图片的背景，即 css 中的 background-image 属性。
 # https://developer.mozilla.org/zh-CN/docs/Web/CSS/background-image
@@ -99,6 +101,11 @@ api_key = ""
 # AI 的提示词，可以在此描述他的基本信息。
 system_prompt = "你是一个可爱的小女孩，乖巧可爱，听父母的话……"
 
+[webui]
+# 是否启用 WebUI 管理面板。
+# 启用后将在机器人端口上挂载 Web API 与 WebSocket，配合 WebUi 前端使用。
+enabled = true
+
 [auto_reply]
 # 是否启用自动回复功能。
 enabled = false
@@ -106,10 +113,3 @@ enabled = false
 # 自动回复的关键词以及回复内容。
 # 若有多个关键词，用逗号隔开；如果需要同时匹配多个关键词，用空格隔开。
 keywords = { "看群公告里的 IP 地址。" = ["服务器 在哪", "服务器", "服务器地址"] }
-
-[api]
-# 是否开启 API 服务器。
-enabled = false
-
-# API 服务器的 token，需附带在请求头中才可通过。
-token = "LonelySail123456"

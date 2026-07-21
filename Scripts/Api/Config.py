@@ -2,8 +2,10 @@ from copy import deepcopy
 
 import tomli_w
 from fastapi import APIRouter, Depends, Request
+from pydantic import BaseModel
 
 from Scripts.Config import TOML_PATH, config
+from Scripts.Managers import environment_manager
 from .Auth import get_current_user, require_role
 
 router = APIRouter(prefix='/api/config', tags=['Config'])
@@ -132,3 +134,102 @@ async def patch_config(request: Request, current_user: dict = Depends(require_ro
             setattr(config, key, value)
 
     return {'code': 0, 'data': None, 'message': 'ok'}
+
+
+# ===== .env 环境变量配置 =====
+
+ENV_SCHEMA = [
+    {'key': 'PORT', 'label': '监听端口', 'type': 'number', 'default': 8000, 'description': 'NoneBot 监听的端口'},
+    {'key': 'HOST', 'label': '监听地址', 'type': 'string', 'default': '127.0.0.1', 'description': 'NoneBot 监听的 IP / 主机名，公网连接请改为 0.0.0.0'},
+    {'key': 'SUPERUSERS', 'label': '超级用户', 'type': 'list', 'default': [], 'description': '拥有管理权限的用户的 QQ 号'},
+    {'key': 'COMMAND_SEP', 'label': '命令分隔符', 'type': 'list', 'default': [' '], 'description': 'NoneBot 命令分隔字符'},
+    {'key': 'COMMAND_START', 'label': '命令起始符', 'type': 'list', 'default': ['.'], 'description': 'NoneBot 命令起始字符'},
+    {'key': 'LOG_LEVEL', 'label': '日志等级', 'type': 'string', 'default': 'INFO', 'description': '日志输出等级'},
+    {'key': 'ONEBOT_ACCESS_TOKEN', 'label': 'OneBot AccessToken', 'type': 'secret', 'default': '', 'description': 'OneBot 平台的 AccessToken'},
+    {'key': 'MINECRAFT_WS_URLS', 'label': 'Minecraft WS 地址', 'type': 'string', 'default': '', 'description': 'Minecraft 服务器 WebSocket 连接地址（JSON 格式）'},
+    {'key': 'MINECRAFT_ACCESS_TOKEN', 'label': 'Minecraft 令牌', 'type': 'secret', 'default': '', 'description': 'Minecraft WebSocket 连接令牌'},
+]
+
+ENV_GROUPS = [
+    {'name': '框架', 'keys': ['PORT', 'HOST', 'SUPERUSERS', 'COMMAND_SEP', 'COMMAND_START', 'LOG_LEVEL']},
+    {'name': '适配器', 'keys': ['ONEBOT_ACCESS_TOKEN', 'MINECRAFT_WS_URLS', 'MINECRAFT_ACCESS_TOKEN']},
+]
+
+
+@router.get('/env', summary='获取环境变量配置')
+async def get_env_config(current_user: dict = Depends(get_current_user)):
+    '''获取 .env 中的配置项'''
+    return {
+        'code': 0,
+        'data': {
+            'values': environment_manager.read_env(),
+            'schema': ENV_SCHEMA,
+            'groups': ENV_GROUPS,
+        },
+        'message': 'ok',
+    }
+
+
+@router.patch('/env', summary='更新环境变量配置')
+async def patch_env_config(request: Request, current_user: dict = Depends(require_role('admin'))):
+    '''部分更新 .env 配置，写回文件（需重启生效）'''
+    try:
+        patch_data = await request.json()
+    except Exception:
+        return {'code': 1, 'data': None, 'message': '请求体格式错误'}
+    environment_manager.update_env(patch_data)
+    return {'code': 0, 'data': None, 'message': 'ok（重启后生效）'}
+
+
+# ===== pyproject.toml NoneBot 插件/适配器管理 =====
+
+
+class NoneBotItemRequest(BaseModel):
+    name: str
+    module_name: str
+
+
+@router.get('/nonebot', summary='获取 NoneBot 插件与适配器列表')
+async def get_nonebot_config(current_user: dict = Depends(get_current_user)):
+    '''获取 pyproject.toml 中的 NoneBot 适配器和插件配置'''
+    project_data = environment_manager.read_pyproject()
+    nonebot_section = project_data.get('tool', {}).get('nonebot', {})
+    return {
+        'code': 0,
+        'data': {
+            'adapters': nonebot_section.get('adapters', []),
+            'plugins': nonebot_section.get('plugins', []),
+            'plugin_dirs': nonebot_section.get('plugin_dirs', []),
+        },
+        'message': 'ok',
+    }
+
+
+@router.post('/nonebot/adapters', summary='添加适配器')
+async def add_adapter(body: NoneBotItemRequest, current_user: dict = Depends(require_role('admin'))):
+    '''向 pyproject.toml 添加适配器'''
+    if environment_manager.add_adapter(body.name, body.module_name):
+        return {'code': 0, 'data': None, 'message': 'ok（重启后生效）'}
+    return {'code': 1, 'data': None, 'message': '该适配器已存在'}
+
+
+@router.delete('/nonebot/adapters', summary='移除适配器')
+async def remove_adapter(body: NoneBotItemRequest, current_user: dict = Depends(require_role('admin'))):
+    '''从 pyproject.toml 移除适配器'''
+    environment_manager.remove_adapter(body.module_name)
+    return {'code': 0, 'data': None, 'message': 'ok（重启后生效）'}
+
+
+@router.post('/nonebot/plugins', summary='添加插件')
+async def add_plugin(body: NoneBotItemRequest, current_user: dict = Depends(require_role('admin'))):
+    '''向 pyproject.toml 添加插件'''
+    if environment_manager.add_plugin(body.module_name):
+        return {'code': 0, 'data': None, 'message': 'ok（重启后生效）'}
+    return {'code': 1, 'data': None, 'message': '该插件已存在'}
+
+
+@router.delete('/nonebot/plugins', summary='移除插件')
+async def remove_plugin(body: NoneBotItemRequest, current_user: dict = Depends(require_role('admin'))):
+    '''从 pyproject.toml 移除插件'''
+    environment_manager.remove_plugin(body.module_name)
+    return {'code': 0, 'data': None, 'message': 'ok（重启后生效）'}
