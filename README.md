@@ -30,6 +30,7 @@
 | **🔗 多服互联** | 同时连接多台 Minecraft 服务器，消息互通，跨服聊天零延迟 |
 | **⚡ WebSocket 实时通信** | 基于 [nonebot-adapter-minecraft](https://github.com/17TheWord/nonebot-adapter-minecraft) 的 WebSocket 长连接，告别轮询，消息即时送达 |
 | **🧩 模块化架构** | 指令按插件拆分，Alconna 命令解析器驱动，扩展新功能就像搭积木 |
+| **🖥️ WebUI 管理面板** | 基于 Vue 3 构建的现代化管理界面，可视化配置、实时监控、日志查看，开箱即用 |
 | **🤖 AI 智能对话** | 接入任意 OpenAI 兼容 API，@机器人即可与 AI 对话，支持上下文记忆 |
 | **🔐 白名单管理** | 完善的 QQ 与游戏 ID 绑定系统，支持多服白名单同步 |
 | **🎨 图片渲染模式** | 基于 HTML + CSS 模板引擎，将指令输出渲染为精美图片，支持自定义背景 |
@@ -48,7 +49,24 @@
 
 ### 🚀 安装与启动
 
-#### 方式一：使用 UV（推荐）
+#### 方式一：一键脚本安装（推荐）
+
+从 [Releases 页面](https://github.com/Minecraft-QQBot/BotServer/releases) 下载对应平台的一键安装脚本：
+
+| 平台 | 脚本 |
+|------|------|
+| **Windows** | `Install.bat` — 双击运行，自动安装 uv、克隆仓库、配置 WebUI 并同步依赖 |
+| **Linux / macOS** | `Install.sh` — `chmod +x Install.sh && ./Install.sh`，一键完成所有部署步骤 |
+
+脚本会自动完成以下操作：
+1. 检测并安装 [UV](https://docs.astral.sh/uv/) 包管理器
+2. 克隆 UniBot 仓库
+3. 询问是否启用 WebUI（选择 `y` 自动开启并安装额外依赖）
+4. 执行 `uv sync` 同步所有依赖
+
+> 💡 一键脚本适合快速部署，如需自定义配置可后续编辑 `.env` 和 `Config.toml`。
+
+#### 方式二：使用 UV（手动）
 
 ```bash
 # 克隆项目
@@ -60,6 +78,9 @@ uv sync
 
 # 如需启用图片渲染模式，额外安装 image 依赖
 uv sync --extra image
+
+# 如需启用 WebUI 管理面板，额外安装 webui 依赖
+uv sync --extra webui
 
 # 编辑配置文件（按需修改）
 # .env — NoneBot 框架与适配器配置
@@ -73,7 +94,7 @@ uv run Bot.py
 > UV 比 pip 快 10-100 倍，自动解析依赖冲突，一条命令即可完成虚拟环境创建与依赖安装。
 > [官方文档](https://uv.doczh.com/)
 
-#### 方式二：使用 pip + venv（传统方式）
+#### 方式三：使用 pip + venv（传统方式）
 
 ```bash
 git clone https://github.com/Minecraft-QQBot/BotServer
@@ -88,6 +109,9 @@ pip install -e .
 
 # 如需启用图片渲染模式，额外安装 image 依赖
 pip install -e ".[image]"
+
+# 如需启用 WebUI 管理面板，额外安装 webui 依赖
+pip install -e ".[webui]"
 
 # 配置环境（编辑 .env 与 Config.toml）
 
@@ -246,6 +270,35 @@ background = 'linear-gradient(150deg, #2e4a30 0%, #1d3524 55%, #12241a 100%)'
 
 > ⚠️ 图片模式会略微增加响应时间（需渲染 HTML 并转换为图片）。模板文件位于 `Resources/Images/` 目录，可自行修改 HTML/CSS 定制样式。
 
+### 🖥️ WebUI 管理面板
+
+UniBot 内置基于 **Vue 3 + Vite** 构建的现代化 Web 管理面板，通过 REST API 与后端交互，让管理机器人变得轻松直观。
+
+**主要功能：**
+
+| 功能 | 说明 |
+|------|------|
+| **📊 仪表盘** | 实时查看机器人运行状态、内存占用、在线服务器数、绑定玩家数 |
+| **⚙️ 配置管理** | 可视化编辑 `Config.toml` 和 `.env` 配置，支持 Schema 校验与分组展示 |
+| **📋 服务器管理** | 查看所有连接服务器的状态、在线玩家，远程执行指令 |
+| **👥 玩家管理** | 管理白名单绑定关系，查看所有已绑定玩家 |
+| **🧩 插件管理** | 查看已加载插件列表及其状态 |
+| **📄 日志查看** | 实时滚动查看机器人运行日志，支持分级筛选 |
+| **🔐 登录认证** | JWT + 密码认证，保障管理安全 |
+
+**启用方式：**
+
+在 `Config.toml` 中设置：
+
+```toml
+[webui]
+enabled = true
+```
+
+启动机器人后，访问 `http://<你的IP>:<PORT>`（默认 `http://127.0.0.1:8000`）即可打开管理面板。首次登录需在 `Config.toml` 中设置 `[api]` 下的 `token` 和密码。
+
+> ⚠️ WebUI 依赖额外包，请确保已执行 `uv sync --extra webui` 或 `pip install -e ".[webui]"`。
+
 ### 智能扩展
 
 - **🤖 AI 对话**：@机器人即可聊天，支持自定义 API 地址、模型和系统提示词，对话上下文自动管理
@@ -262,6 +315,7 @@ background = 'linear-gradient(150deg, #2e4a30 0%, #1d3524 55%, #12241a 100%)'
 - 绑定数量限制（`qq_bound_max_number`）
 - 服务器信息缓存策略（`server_memory_update_interval` / `server_memory_max_cache`）
 - API 接口开放（可选，`[api]`）
+- WebUI 管理面板（可选，`[webui]`）
 
 ---
 
@@ -287,16 +341,35 @@ UniBot
 │   └── Expand/
 │       ├── Ai.py                   ← AI 智能对话
 │       └── Keywords.py             ← 关键词自动回复
-└── Scripts/
-    ├── Managers/
-    │   ├── Data.py                 ← 数据持久化
-    │   ├── Server.py               ← 服务器连接管理
-    │   ├── Environment.py          ← 环境管理
-    │   └── Version.py              ← 版本管理
-    ├── Config.py                   ← 配置模型定义
-    ├── Network.py                  ← 网络请求工具
-    ├── Utils.py                    ← 工具函数
-    └── Render.py                   ← 图片渲染引擎
+├── Scripts/
+│   ├── Managers/
+│   │   ├── Data.py                 ← 数据持久化
+│   │   ├── Server.py               ← 服务器连接管理
+│   │   ├── Environment.py          ← 环境管理
+│   │   └── Version.py              ← 版本管理
+│   ├── Api/                        ← REST API 路由
+│   │   ├── Auth.py                 ← 登录认证
+│   │   ├── Config.py               ← 配置管理
+│   │   ├── Players.py              ← 玩家管理
+│   │   ├── Servers.py              ← 服务器管理
+│   │   ├── Plugins.py              ← 插件管理
+│   │   ├── Logs.py                 ← 日志查看
+│   │   ├── Status.py               ← 状态监控
+│   │   ├── Users.py                ← 用户管理
+│   │   ├── Ws.py                   ← WebSocket 推送
+│   │   └── Schemas.py              ← 数据模型与校验
+│   ├── Config.py                   ← 配置模型定义
+│   ├── Network.py                  ← 网络请求工具
+│   ├── Utils.py                    ← 工具函数
+│   └── Render.py                   ← 图片渲染引擎
+└── WebUi/                          ← Vue 3 管理面板前端
+    ├── src/
+    │   ├── views/                  ← 各功能页面
+    │   ├── stores/                 ← Pinia 状态管理
+    │   ├── router/                 ← 路由配置
+    │   ├── utils/                  ← 工具函数
+    │   └── composables/            ← 组合式 API
+    └── assets/                     ← 静态资源
 ```
 
 ### 通信流程
@@ -351,7 +424,8 @@ flowchart TB
 | WebSocket 通信 | ✅ 实时长连接 | ⚠️ 多为 HTTP 轮询 |
 | 模块化插件 | ✅ 指令即插即用 | ❌ 单体耦合 |
 | AI 集成 | ✅ 开箱即用 | ❌ 需自行对接 |
-| 图片渲染 | ✅ HTML/CSS 模板引擎 | ❌ 无 |
+| 🖥️ WebUI | ✅ Vue 3 管理面板，开箱即用 | ❌ 无 |
+| 🎨 图片渲染 | ✅ HTML/CSS 模板引擎 | ❌ 无 |
 | 白名单管理 | ✅ 完善的绑定系统 | ❌ 无或基础 |
 
 ---
