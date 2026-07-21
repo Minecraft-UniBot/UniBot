@@ -25,9 +25,8 @@ class AutoReplyConfig(BaseModel):
     keywords: dict[str, list[str]] | None = None
 
 
-class ApiConfig(BaseModel):
+class WebUiConfig(BaseModel):
     enabled: bool = False
-    token: str | None = None
 
 
 class Config(BaseModel):
@@ -71,11 +70,11 @@ class Config(BaseModel):
     image: ImageConfig = ImageConfig()
     ai: AiConfig = AiConfig()
     auto_reply: AutoReplyConfig = AutoReplyConfig()
-    api: ApiConfig = ApiConfig()
+    webui: WebUiConfig = WebUiConfig()
 
     @model_validator(mode='after')
     def normalize(self):
-        self.bot_prefix = self.bot_prefix.upper() if self.bot_prefix else None
+        self.bot_prefix = self.bot_prefix.upper() if self.bot_prefix else ''
         if 'about' not in self.command_enabled:
             self.command_enabled.append('about')
         if self.sync_all_qq_message and 'send' in self.command_enabled:

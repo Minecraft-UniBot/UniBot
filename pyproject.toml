@@ -10,6 +10,10 @@ dependencies = [
     "nonebot-adapter-minecraft>=1.8.1",
     "nonebot-plugin-alconna>=0.62.0",
     "nonebot-plugin-uninfo>=0.11.0",
+    "psutil>=6.0.0",
+    "tomli-w>=1.0.0",
+    "PyJWT>=2.8.0",
+    "bcrypt>=4.0.0",
 ]
 
 [project.optional-dependencies]
@@ -29,7 +33,7 @@ default = true
 [tool.nonebot]
 adapters = [
     { name = "Minecraft", module_name = "nonebot.adapters.minecraft" },
-    # { name = "OneBot V11", module_name = "nonebot.adapters.onebot.v11" },
+    { name = "OneBot V11", module_name = "nonebot.adapters.onebot.v11" },
 ]
 plugins = []
 plugin_dirs = ["Plugins"]
