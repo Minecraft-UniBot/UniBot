@@ -8,7 +8,7 @@ from nonebot.log import logger
 
 from Scripts.Network import download
 from Scripts.Api import api_router, setup_cors
-from Scripts.Api.Ws import log_sink
+from Scripts.Api.WebSocket import log_sink
 from .Environment import environment_manager
 
 

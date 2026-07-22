@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends
 from Scripts.Config import config
 from Scripts.Managers import data_manager, server_manager, version_manager
 from .Auth import get_current_user
-from .Ws import ws_clients
+from .WebSocket import ws_clients
 
 router = APIRouter(prefix='/api/status', tags=['Status'])
 

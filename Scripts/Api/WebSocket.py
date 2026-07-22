@@ -47,8 +47,8 @@ def log_sink(message):
 @router.websocket('/ws')
 async def websocket_endpoint(websocket: WebSocket):
     '''WebSocket 端点，支持订阅日志、服务器、玩家、系统事件'''
-    # 通过 query 参数中的 JWT 验证身份
-    token = websocket.query_params.get('token', '')
+    # 通过 cookie 中的 access_token 验证身份（fallback 到 query 参数兼容旧版）
+    token = websocket.cookies.get('unibot_access_token', '') or websocket.query_params.get('token', '')
     if not token:
         await websocket.close(code=4001, reason='Unauthorized')
         return

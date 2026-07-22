@@ -15,10 +15,12 @@ class LoginRequest(BaseModel):
 
 
 class RefreshRequest(BaseModel):
-    refresh_token: str
+    # 可选，服务端优先从 cookie 读取
+    refresh_token: str = ''
 
 
 class LogoutRequest(BaseModel):
+    # 可选，服务端优先从 cookie 读取
     refresh_token: str = ''
 
 

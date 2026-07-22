@@ -1,8 +1,10 @@
 import asyncio
 from datetime import datetime, timedelta, timezone
+from json import dumps
 
 import jwt
-from fastapi import APIRouter, Depends, Header, HTTPException
+from fastapi import APIRouter, Depends, Header, HTTPException, Request
+from fastapi.responses import JSONResponse
 from nonebot.log import logger
 
 from Scripts.Managers import data_manager
@@ -15,6 +17,49 @@ from .Schemas import (
     SetupRequest,
     UpdateProfileRequest,
 )
+
+# Cookie 配置
+COOKIE_ACCESS_KEY = 'unibot_access_token'
+COOKIE_REFRESH_KEY = 'unibot_refresh_token'
+COOKIE_FLAG_KEY = 'unibot_authenticated'
+
+
+def set_auth_cookies(response: JSONResponse, access_token: str, refresh_token: str | None = None):
+    '''设置 HttpOnly 安全 cookie（access_token 短期 + refresh_token 长期）'''
+    response.set_cookie(
+        key=COOKIE_ACCESS_KEY,
+        value=access_token,
+        max_age=ACCESS_TOKEN_EXPIRE_HOURS * 3600,
+        httponly=True,
+        samesite='lax',
+        # secure=True,   # 生产环境开启（需 HTTPS）
+        path='/webui',
+    )
+    if refresh_token:
+        response.set_cookie(
+            key=COOKIE_REFRESH_KEY,
+            value=refresh_token,
+            max_age=REFRESH_TOKEN_EXPIRE_DAYS * 86400,
+            httponly=True,
+            samesite='lax',
+            # secure=True,
+            path='/webui',
+        )
+    # 非 HttpOnly 标记 cookie，仅用于前端快速判断登录态，不含敏感信息
+    response.set_cookie(
+        key=COOKIE_FLAG_KEY,
+        value='1',
+        max_age=REFRESH_TOKEN_EXPIRE_DAYS * 86400,
+        httponly=False,
+        samesite='lax',
+        path='/webui',
+    )
+
+
+def clear_auth_cookies(response: JSONResponse):
+    '''清除所有认证 cookie'''
+    for key in (COOKIE_ACCESS_KEY, COOKIE_REFRESH_KEY, COOKIE_FLAG_KEY):
+        response.delete_cookie(key=key, path='/webui')
 
 router = APIRouter(
     prefix='/api/auth',
@@ -53,11 +98,15 @@ def create_refresh_token(user_id: str) -> str:
     return jwt.encode(payload, data_manager.secret_key, algorithm='HS256')
 
 
-async def get_current_user(authorization: str | None = Header(None)) -> dict:
-    '''解析 JWT，返回当前用户对象'''
-    if not authorization or not authorization.startswith('Bearer '):
+async def get_current_user(request: Request, authorization: str | None = Header(None)) -> dict:
+    '''解析 JWT，返回当前用户对象（优先从 Authorization header，fallback 到 cookie）'''
+    token = None
+    if authorization and authorization.startswith('Bearer '):
+        token = authorization[7:]
+    if not token:
+        token = request.cookies.get(COOKIE_ACCESS_KEY)
+    if not token:
         raise HTTPException(status_code=401, detail='未认证')
-    token = authorization[7:]
     try:
         payload = jwt.decode(token, data_manager.secret_key, algorithms=['HS256'])
     except jwt.ExpiredSignatureError:
@@ -100,33 +149,35 @@ async def setup(body: SetupRequest):
 
 @router.post('/login', summary='用户登录')
 async def login(body: LoginRequest):
-    '''用户名密码登录，返回 JWT'''
+    '''用户名密码登录，通过 HttpOnly cookie 下发 JWT'''
     user_data = data_manager.get_user_by_username(body.username)
     if not user_data or not data_manager.verify_password(body.password, user_data['password_hash']):
         return {'code': 1, 'data': None, 'message': '用户名或密码错误'}
     await data_manager.update_last_login(user_data['user_id'])
     access_token = create_access_token(user_data['user_id'], user_data['role'])
     refresh_token = create_refresh_token(user_data['user_id'])
-    return {
+    response = JSONResponse({
         'code': 0,
         'data': {
-            'access_token': access_token,
-            'refresh_token': refresh_token,
-            'token_type': 'Bearer',
-            'expires_in': ACCESS_TOKEN_EXPIRE_HOURS * 3600,
             'user': data_manager.public_user_info(user_data),
+            'expires_in': ACCESS_TOKEN_EXPIRE_HOURS * 3600,
         },
         'message': 'ok',
-    }
+    })
+    set_auth_cookies(response, access_token, refresh_token)
+    return response
 
 
 @router.post('/refresh', summary='刷新 Token')
-async def refresh(body: RefreshRequest):
-    '''使用 refresh_token 换取新的 access_token'''
-    if body.refresh_token in revoked_tokens:
+async def refresh(request: Request, body: RefreshRequest):
+    '''使用 refresh_token 换取新的 access_token（优先从 cookie 读取）'''
+    refresh_token = request.cookies.get(COOKIE_REFRESH_KEY) or body.refresh_token
+    if not refresh_token:
+        return {'code': 401, 'data': None, 'message': '缺少 refresh_token'}
+    if refresh_token in revoked_tokens:
         return {'code': 401, 'data': None, 'message': 'Token 已失效'}
     try:
-        payload = jwt.decode(body.refresh_token, data_manager.secret_key, algorithms=['HS256'])
+        payload = jwt.decode(refresh_token, data_manager.secret_key, algorithms=['HS256'])
     except jwt.InvalidTokenError:
         return {'code': 401, 'data': None, 'message': '无效的 refresh_token'}
     if payload.get('type') != 'refresh':
@@ -135,19 +186,24 @@ async def refresh(body: RefreshRequest):
     if not user_data:
         return {'code': 401, 'data': None, 'message': '用户不存在'}
     access_token = create_access_token(user_data['user_id'], user_data['role'])
-    return {
+    response = JSONResponse({
         'code': 0,
-        'data': {'access_token': access_token, 'expires_in': ACCESS_TOKEN_EXPIRE_HOURS * 3600},
+        'data': {'expires_in': ACCESS_TOKEN_EXPIRE_HOURS * 3600},
         'message': 'ok',
-    }
+    })
+    set_auth_cookies(response, access_token)  # 刷新 access_token cookie
+    return response
 
 
 @router.post('/logout', summary='退出登录')
-async def logout(body: LogoutRequest):
-    '''使当前 refresh_token 失效'''
-    if body.refresh_token:
-        revoked_tokens.add(body.refresh_token)
-    return {'code': 0, 'data': None, 'message': 'ok'}
+async def logout(request: Request, body: LogoutRequest):
+    '''使当前 refresh_token 失效并清除 cookie'''
+    refresh_token = request.cookies.get(COOKIE_REFRESH_KEY) or body.refresh_token
+    if refresh_token:
+        revoked_tokens.add(refresh_token)
+    response = JSONResponse({'code': 0, 'data': None, 'message': 'ok'})
+    clear_auth_cookies(response)
+    return response
 
 
 @router.get('/me', summary='获取当前用户信息')

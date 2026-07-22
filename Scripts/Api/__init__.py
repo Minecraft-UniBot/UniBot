@@ -9,7 +9,7 @@ from .Servers import router as servers_router
 from .Players import router as players_router
 from .Logs import router as logs_router
 from .Plugins import router as plugins_router
-from .Ws import router as ws_router
+from .WebSocket import router as ws_router
 
 api_router = APIRouter()
 api_router.include_router(auth_router)
