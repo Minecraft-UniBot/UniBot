@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="119 107 274 298" width="274" height="298">
+  <defs>
+    <linearGradient id="uGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="50%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#8b5cf6"/>
+    </linearGradient>
+    <linearGradient id="grassGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#06b6d4"/>
+    </linearGradient>
+    <filter id="nodeGlow" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur stdDeviation="6" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <clipPath id="topClip"><polygon points="256,168 336,208 256,248 176,208"/></clipPath>
+    <clipPath id="leftClip"><polygon points="176,208 256,248 256,344 176,304"/></clipPath>
+    <clipPath id="rightClip"><polygon points="256,248 336,208 336,304 256,344"/></clipPath>
+  </defs>
+
+  <!-- ========== 连接虚线 ========== -->
+  <path d="M 256 168 Q 210 120 158 146" stroke="#6366f1" stroke-width="3.5"
+        stroke-dasharray="8 4" fill="none" opacity="0.55" stroke-linecap="round"/>
+  <path d="M 256 168 Q 302 120 354 146" stroke="#6366f1" stroke-width="3.5"
+        stroke-dasharray="8 4" fill="none" opacity="0.55" stroke-linecap="round"/>
+
+  <!-- ========== U 形主体（黑色外描边 + 蓝紫渐变芯） ========== -->
+  <path d="M 158 146 L 158 281 C 158 341 200 366 256 366 C 312 366 354 341 354 281 L 354 146"
+        stroke="#000" stroke-width="74"
+        stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M 158 146 L 158 281 C 158 341 200 366 256 366 C 312 366 354 341 354 281 L 354 146"
+        stroke="url(#uGrad)" stroke-width="64"
+        stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+
+  <!-- ========== 草方块（统一黑色描边） ========== -->
+  <g>
+    <!-- 顶面 -->
+    <g clip-path="url(#topClip)">
+      <polygon points="256,168 336,208 256,248 176,208" fill="url(#grassGrad)"/>
+      <g shape-rendering="crispEdges" transform="matrix(10 -5 10 5 176 208)">
+        <rect x="1" y="1" width="1" height="1" fill="#000" opacity="0.06"/>
+        <rect x="4" y="0" width="1" height="1" fill="#000" opacity="0.06"/>
+        <rect x="6" y="3" width="1" height="1" fill="#000" opacity="0.06"/>
+        <rect x="2" y="4" width="1" height="1" fill="#000" opacity="0.06"/>
+        <rect x="5" y="6" width="1" height="1" fill="#000" opacity="0.06"/>
+        <rect x="0" y="2" width="1" height="1" fill="#000" opacity="0.05"/>
+        <rect x="7" y="5" width="1" height="1" fill="#000" opacity="0.05"/>
+        <rect x="3" y="7" width="1" height="1" fill="#000" opacity="0.05"/>
+      </g>
+    </g>
+    <!-- 左面 -->
+    <g clip-path="url(#leftClip)">
+      <polygon points="176,208 256,248 256,344 176,304" fill="#7d5840"/>
+      <polygon points="176,208 256,248 256,268 176,228" fill="#10b981"/>
+      <g shape-rendering="crispEdges" transform="matrix(10 5 0 12 176 208)">
+        <rect x="3" y="4" width="1" height="1" fill="#000" opacity="0.07"/>
+        <rect x="6" y="3" width="1" height="1" fill="#000" opacity="0.07"/>
+        <rect x="1" y="6" width="1" height="1" fill="#000" opacity="0.06"/>
+        <rect x="5" y="5" width="1" height="1" fill="#000" opacity="0.06"/>
+        <rect x="2" y="7" width="1" height="1" fill="#000" opacity="0.05"/>
+        <rect x="7" y="6" width="1" height="1" fill="#000" opacity="0.05"/>
+      </g>
+    </g>
+    <!-- 右面 -->
+    <g clip-path="url(#rightClip)">
+      <polygon points="256,248 336,208 336,304 256,344" fill="#6a4a33"/>
+      <polygon points="256,248 336,208 336,228 256,268" fill="#0c8a5f"/>
+      <g shape-rendering="crispEdges" transform="matrix(10 -5 0 12 256 248)">
+        <rect x="3" y="4" width="1" height="1" fill="#000" opacity="0.08"/>
+        <rect x="6" y="3" width="1" height="1" fill="#000" opacity="0.08"/>
+        <rect x="1" y="6" width="1" height="1" fill="#000" opacity="0.06"/>
+        <rect x="5" y="5" width="1" height="1" fill="#000" opacity="0.06"/>
+        <rect x="2" y="7" width="1" height="1" fill="#000" opacity="0.05"/>
+        <rect x="7" y="6" width="1" height="1" fill="#000" opacity="0.05"/>
+      </g>
+    </g>
+    <!-- 棱线（全部黑色统一粗细） -->
+    <line x1="256" y1="168" x2="176" y2="208" stroke="#000" stroke-width="2.5" opacity="0.5"/>
+    <line x1="256" y1="168" x2="336" y2="208" stroke="#000" stroke-width="2.5" opacity="0.5"/>
+    <line x1="176" y1="208" x2="256" y2="248" stroke="#000" stroke-width="2.5" opacity="0.35"/>
+    <line x1="256" y1="248" x2="336" y2="208" stroke="#000" stroke-width="2.5" opacity="0.35"/>
+    <line x1="176" y1="208" x2="176" y2="304" stroke="#000" stroke-width="2.5" opacity="0.4"/>
+    <line x1="336" y1="208" x2="336" y2="304" stroke="#000" stroke-width="2.5" opacity="0.45"/>
+    <line x1="256" y1="248" x2="256" y2="344" stroke="#000" stroke-width="2.5" opacity="0.4"/>
+    <line x1="176" y1="304" x2="256" y2="344" stroke="#000" stroke-width="2.5" opacity="0.35"/>
+    <line x1="256" y1="344" x2="336" y2="304" stroke="#000" stroke-width="2.5" opacity="0.4"/>
+    <polygon points="256,168 336,208 336,304 256,344 176,304 176,208" fill="none" stroke="#000" stroke-width="3" opacity="0.3"/>
+  </g>
+
+  <!-- ========== 连接节点 ========== -->
+  <g filter="url(#nodeGlow)">
+    <circle cx="158" cy="146" r="22" fill="#ffffff" opacity="0.95"/>
+    <circle cx="158" cy="146" r="10" fill="#3b82f6"/>
+  </g>
+  <g filter="url(#nodeGlow)">
+    <circle cx="354" cy="146" r="22" fill="#ffffff" opacity="0.95"/>
+    <circle cx="354" cy="146" r="10" fill="#8b5cf6"/>
+  </g>
+</svg>
