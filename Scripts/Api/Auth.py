@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, Header, HTTPException
 from nonebot.log import logger
 
 from Scripts.Managers import data_manager
+from .Limiter import rate_limiter
 from .Schemas import (
     ChangePasswordRequest,
     LoginRequest,
@@ -15,7 +16,11 @@ from .Schemas import (
     UpdateProfileRequest,
 )
 
-router = APIRouter(prefix='/api/auth', tags=['Auth'])
+router = APIRouter(
+    prefix='/api/auth',
+    tags=['Auth'],
+    dependencies=[Depends(rate_limiter.check)],
+)
 
 ACCESS_TOKEN_EXPIRE_HOURS = 2
 REFRESH_TOKEN_EXPIRE_DAYS = 7

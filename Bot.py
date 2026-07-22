@@ -37,7 +37,8 @@ def main():
 
 @driver.on_startup
 async def startup():
-    from Scripts.Config import config as bot_config
+    from Scripts.Config import config
+    from Scripts.Api.Limiter import rate_limiter
     from Scripts.Managers import version_manager, server_manager, data_manager, plugin_manager, webui_manager
 
     await version_manager.init()
@@ -45,14 +46,17 @@ async def startup():
     data_manager.load()
     plugin_manager.load()
 
-    if bot_config.webui.enabled:
+    if config.webui.enabled:
         await webui_manager.init()
+        rate_limiter.start()
 
 
 @driver.on_shutdown
 async def shutdown():
+    from Scripts.Api.Limiter import rate_limiter
     from Scripts.Managers import data_manager
 
+    rate_limiter.stop()
     await data_manager.save()
 
 
