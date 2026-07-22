@@ -15,8 +15,16 @@ def main():
     environment_manager.init()
 
     for adapter in environment_manager.nonebot_config.get('adapters', []):
-        module = importlib.import_module(adapter['module_name'])
-        driver.register_adapter(getattr(module, 'Adapter'))
+        try:
+            module = importlib.import_module(adapter['module_name'])
+        except ImportError:
+            logger.warning(f'导入适配器模块 {adapter["module_name"]} 失败，已跳过！')
+            continue
+        adapter_class = getattr(module, 'Adapter', None)
+        if adapter_class is None:
+            logger.warning(f'适配器模块 {adapter["module_name"]} 未包含 Adapter 类，已跳过！')
+            continue
+        driver.register_adapter(adapter_class)
     for plugin in environment_manager.nonebot_config.get('plugins', []):
         nonebot.load_plugin(plugin)
     for plugin_dir in environment_manager.nonebot_config.get('plugin_dirs', []):

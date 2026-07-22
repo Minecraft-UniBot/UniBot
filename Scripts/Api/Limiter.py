@@ -13,17 +13,21 @@ class RateLimiter:
         self,
         max_requests: int = 10,
         window_seconds: int = 60,
-        ban_seconds: int = 300,
+        base_ban_seconds: int = 60,
+        max_ban_seconds: int = 86400,
+        backoff_factor: float = 3.0,
         cleanup_interval: int = 60,
     ):
         self.max_requests = max_requests
         self.window_seconds = window_seconds
-        self.ban_seconds = ban_seconds
+        self.base_ban_seconds = base_ban_seconds
+        self.max_ban_seconds = max_ban_seconds
+        self.backoff_factor = backoff_factor
         self.cleanup_interval = cleanup_interval
 
-        # {ip: {"timestamps": [float, ...], "banned_until": float | None}}
+        # {ip: {"timestamps": [float, ...], "banned_until": float | None, "ban_count": int}}
         self.records: dict[str, dict] = defaultdict(
-            lambda: {'timestamps': [], 'banned_until': None}
+            lambda: {'timestamps': [], 'banned_until': None, 'ban_count': 0}
         )
         self.cleanup_task: asyncio.Task | None = None
 
@@ -64,10 +68,13 @@ class RateLimiter:
         # 添加当前请求
         timestamps.append(now)
 
-        # 判断是否超出阈值
+        # 判断是否超出阈值，指数退避封禁时长
         if len(timestamps) > self.max_requests:
-            record['banned_until'] = now + self.ban_seconds
-            logger.warning(f'IP [{ip}] 请求频率异常（{len(timestamps)} 次/{self.window_seconds}s），已封禁 {self.ban_seconds}s！')
+            record['ban_count'] += 1
+            ban_duration = int(self.base_ban_seconds * (self.backoff_factor ** (record['ban_count'] - 1)))
+            ban_duration = min(ban_duration, self.max_ban_seconds)
+            record['banned_until'] = now + ban_duration
+            logger.warning(f'IP [{ip}] 请求频率异常（{len(timestamps)} 次/{self.window_seconds}s），第 {record["ban_count"]} 次封禁 {ban_duration}s！')
             return False
 
         return True
@@ -77,8 +84,8 @@ class RateLimiter:
         client_ip = self.get_client_ip(request)
 
         # 若本地则忽略
-        if client_ip == '127.0.0.1':
-            return
+        # if client_ip == '127.0.0.1':
+        #     return
 
         if self.is_banned(client_ip):
             record = self.records[client_ip]

@@ -143,6 +143,8 @@ async def setup(body: SetupRequest):
         if data_manager.is_initialized:
             return {'code': 1, 'data': None, 'message': '系统已初始化，禁止重复创建管理员账户'}
         user_info = await data_manager.create_user(body.username, body.password, body.nickname, role='admin')
+        if user_info is None:
+            return {'code': 1, 'data': None, 'message': '创建失败！'}
     logger.success(f'WebUI 管理员账户 [{body.username}] 创建成功！')
     return {'code': 0, 'data': {'user_id': user_info['user_id']}, 'message': '初始化成功'}
 

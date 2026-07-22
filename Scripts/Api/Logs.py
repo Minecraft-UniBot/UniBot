@@ -8,7 +8,7 @@ from .Auth import get_current_user, require_role
 
 router = APIRouter(prefix='/api/logs', tags=['Logs'])
 
-LOGS_DIR = Path('Logs')
+LOGS_DIR = Path('Logs').resolve()
 
 # 日志行解析正则：匹配 loguru 格式 "2026-07-20 12:00:01.123 | INFO     | module - message"
 LOG_LINE_PATTERN = re.compile(
@@ -91,8 +91,8 @@ async def get_log_content(
 @router.delete('/{name}', summary='删除日志文件')
 async def delete_log(name: str, current_user: dict = Depends(require_role('admin'))):
     '''删除指定日志文件'''
-    log_file = LOGS_DIR / name
-    if not log_file.exists() or not name.endswith('.log'):
+    log_file = (LOGS_DIR / name).resolve()
+    if not log_file.exists() or not name.endswith('.log') or not str(log_file).startswith(str(LOGS_DIR)):
         return {'code': 404, 'data': None, 'message': '日志文件不存在'}
     log_file.unlink()
     return {'code': 0, 'data': None, 'message': 'ok'}
