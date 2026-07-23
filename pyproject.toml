@@ -42,5 +42,16 @@ adapters = [
     { name = "Minecraft", module_name = "nonebot.adapters.minecraft" },
     { name = "OneBot V11", module_name = "nonebot.adapters.onebot.v11" },
 ]
-plugins = []
-plugin_dirs = ["Plugins"]
+plugins = [
+    { module_name = "Plugins.Commands.About", enabled = true },
+    { module_name = "Plugins.Commands.Bound", enabled = true },
+    { module_name = "Plugins.Commands.Command", enabled = true },
+    { module_name = "Plugins.Commands.Help", enabled = true },
+    { module_name = "Plugins.Commands.List", enabled = true },
+    { module_name = "Plugins.Commands.Luck", enabled = true },
+    { module_name = "Plugins.Commands.Send", enabled = true },
+    { module_name = "Plugins.Commands.Server", enabled = true },
+    { module_name = "Plugins.Expand.Ai", enabled = false },
+    { module_name = "Plugins.Expand.Keywords", enabled = false },
+    { module_name = "Plugins.Events", enabled = true },
+]

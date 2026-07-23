@@ -53,7 +53,6 @@ async def get_config_schema(current_user: dict = Depends(get_current_user)):
                 {'key': 'token', 'label': '连接密钥', 'type': 'secret', 'default': '', 'description': '防止未授权连接的密钥'},
                 {'key': 'admin_superusers', 'label': '管理员视为超管', 'type': 'boolean', 'default': True, 'description': '是否将所有的管理员视为超级用户'},
                 {'key': 'bot_prefix', 'label': '假人前缀', 'type': 'string', 'default': '', 'description': '假人前缀，用于 list 指令分类'},
-                {'key': 'command_enabled', 'label': '启用的指令', 'type': 'list', 'default': [], 'description': '启用的指令列表'},
                 {'key': 'command_groups', 'label': '指令群', 'type': 'list', 'default': [], 'description': '机器人只响应这些群的指令'},
                 {'key': 'message_groups', 'label': '消息群', 'type': 'list', 'default': [], 'description': '消息同步的 QQ 群'},
                 {'key': 'command_minecraft_whitelist', 'label': 'Minecraft 指令白名单', 'type': 'list', 'default': [], 'description': '允许执行的指令白名单'},
@@ -81,7 +80,7 @@ async def get_config_schema(current_user: dict = Depends(get_current_user)):
             ],
             'groups': [
                 {'name': '基础', 'keys': ['token', 'admin_superusers', 'bot_prefix']},
-                {'name': '指令', 'keys': ['command_enabled', 'command_groups', 'command_minecraft_whitelist', 'command_minecraft_blacklist']},
+                {'name': '指令', 'keys': ['command_groups', 'command_minecraft_whitelist', 'command_minecraft_blacklist']},
                 {'name': '消息同步', 'keys': ['broadcast_server', 'broadcast_player', 'sync_all_qq_message', 'sync_all_game_message', 'sync_message_between_servers', 'sync_sensitive_words', 'sync_color_source', 'sync_color_player', 'sync_color_message']},
                 {'name': '玩家', 'keys': ['qq_bound_max_number', 'list_compatible_mode', 'whitelist_command']},
                 {'name': '图片渲染', 'keys': ['image.mode', 'image.background']},
@@ -215,7 +214,6 @@ async def get_nonebot_config(current_user: dict = Depends(get_current_user)):
         'data': {
             'adapters': nonebot_section.get('adapters', []),
             'plugins': nonebot_section.get('plugins', []),
-            'plugin_dirs': nonebot_section.get('plugin_dirs', []),
         },
         'message': 'ok',
     }

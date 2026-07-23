@@ -2,7 +2,7 @@ import random
 from datetime import date
 from hashlib import md5
 
-from nonebot.log import logger
+from nonebot.plugin import PluginMetadata
 from nonebot_plugin_alconna import Command
 from nonebot_plugin_alconna.uniseg import Image, UniMessage
 from nonebot_plugin_uninfo import Uninfo
@@ -12,14 +12,18 @@ from Scripts.Globals import render_template
 from Scripts.Utils import turn_message_text
 from Scripts.Rules import command_group_rule
 
+__plugin_meta__ = PluginMetadata(
+    name='今日人品',
+    description='根据用户与日期生成稳定的今日人品和宜忌。',
+    usage='.luck',
+)
+
 bad_things = (
     '造世吞（直接放飞', '修机器（一修就炸', '挖矿（只挖到原石', '造建筑（啥都没有', '钓鱼（全部是垃圾', '刷附魔（刷的垃圾'
 )
 good_things = (
     '造世吞（完美运行', '修机器（一修就好', '挖矿（挖到十钻石', '造建筑（要啥都有', '钓鱼（钓到把神弓', '刷附魔（一发就中'
 )
-
-logger.debug('加载命令 Luck 完毕！')
 
 matcher = (
     Command('luck', '查看今日人品值。')

@@ -26,9 +26,10 @@ def main():
             continue
         driver.register_adapter(adapter_class)
     for plugin in environment_manager.nonebot_config.get('plugins', []):
-        nonebot.load_plugin(plugin)
-    for plugin_dir in environment_manager.nonebot_config.get('plugin_dirs', []):
-        nonebot.load_plugins(plugin_dir)
+        module_name = plugin if isinstance(plugin, str) else plugin.get('module_name', '')
+        enabled = plugin if isinstance(plugin, str) else plugin.get('enabled', True)
+        if module_name and enabled:
+            nonebot.load_plugin(module_name)
 
     # 挂载 WebUI API 路由（需在 nonebot.init() 之后、nonebot.run() 之前）
 

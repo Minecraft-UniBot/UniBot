@@ -1,4 +1,5 @@
 from nonebot.log import logger
+from nonebot.plugin import PluginMetadata
 from nonebot_plugin_uninfo import Uninfo
 from nonebot_plugin_alconna import Command, Match
 
@@ -7,7 +8,11 @@ from Scripts.Managers import server_manager
 from Scripts.Rules import command_group_rule
 from Scripts.Utils import turn_message_text, get_permission
 
-logger.debug('加载命令 Command 完毕！')
+__plugin_meta__ = PluginMetadata(
+    name='控制台命令',
+    description='向指定 Minecraft 服务器发送经过权限校验的控制台命令。',
+    usage='.command <服务器名称> <命令>',
+)
 
 matcher = (
     Command('command <server#服务器名称:str> <command#要执行的命令:str+>', '向指定服务器发送控制台命令。')

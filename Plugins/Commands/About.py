@@ -1,4 +1,5 @@
 from nonebot.log import logger
+from nonebot.plugin import PluginMetadata
 from nonebot_plugin_alconna import Command
 from nonebot_plugin_alconna.uniseg import Image, UniMessage
 
@@ -8,7 +9,11 @@ from Scripts.Managers.Version import version_manager
 from Scripts.Utils import turn_message_text
 from Scripts.Rules import command_group_rule
 
-logger.debug('加载命令 About 完毕！')
+__plugin_meta__ = PluginMetadata(
+    name='关于信息',
+    description='展示 UniBot 的版本、更新状态与项目信息。',
+    usage='.about',
+)
 
 matcher = (
     Command('about', '查看关于信息。')

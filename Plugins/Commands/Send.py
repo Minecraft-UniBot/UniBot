@@ -1,4 +1,4 @@
-from nonebot.log import logger
+from nonebot.plugin import PluginMetadata
 from nonebot_plugin_alconna import Command, Match
 from nonebot_plugin_uninfo import Uninfo
 
@@ -6,10 +6,15 @@ from Scripts.Managers import data_manager, server_manager
 from Scripts.Utils import get_player_name
 from Scripts.Rules import command_group_rule
 
-logger.debug('加载命令 Send 完毕！')
+__plugin_meta__ = PluginMetadata(
+    name='消息发送',
+    description='将聊天平台中的消息广播到已连接的 Minecraft 服务器。',
+    usage='.send <消息内容>',
+)
 
 matcher = (
     Command('send <message#要发送的消息内容:str+>', '向已连接的服务器发送消息。')
+    .alias('mc')
     .build(rule=command_group_rule, use_cmd_start=True)
 )
 

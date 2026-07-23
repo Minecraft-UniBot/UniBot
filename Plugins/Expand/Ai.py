@@ -3,12 +3,19 @@ from openai import RateLimitError, BadRequestError
 
 from nonebot import on_message
 from nonebot.log import logger
+from nonebot.plugin import PluginMetadata
 from nonebot.rule import to_me
 from nonebot_plugin_alconna import UniMsg
 from nonebot_plugin_uninfo import Uninfo
 
 from Scripts.Config import config
 from Scripts.Utils import get_permission
+
+__plugin_meta__ = PluginMetadata(
+    name='AI 对话',
+    description='通过 OpenAI 兼容接口提供上下文对话功能。',
+    usage='向机器人发送消息开始对话。',
+)
 
 logger.debug('加载 Ai 功能完毕！')
 client = AsyncClient(base_url=config.ai.base_url, api_key=config.ai.api_key)

@@ -1,82 +1,90 @@
-from asyncio import Lock
-from json import loads, dump
-from pathlib import Path
-
 import nonebot
 from nonebot.log import logger
 
 
 class PluginManager:
-    '''插件管理器，管理已安装插件的启停状态与市场交互'''
-
-    plugin_states: dict[str, bool] = {}
-
-    data_dir = Path('Data')
-    plugins_file = data_dir / 'Plugins.json'
-
-    lock = Lock()
+    '''插件管理器，管理 pyproject.toml 中登记的插件与依赖插件'''
 
     def load(self):
-        '''加载插件启停状态'''
-        if self.plugins_file.exists():
-            try:
-                self.plugin_states = loads(self.plugins_file.read_text('Utf-8'))
-            except Exception:
-                logger.warning('插件状态文件损坏，使用空数据！')
-                self.plugin_states = {}
-        logger.success('加载插件状态完毕！')
+        '''记录插件管理器已完成初始化。'''
+        logger.success('加载插件管理器完毕！')
 
-    async def save(self):
-        '''持久化插件启停状态'''
-        async with self.lock:
-            with self.plugins_file.open('w', encoding='Utf-8') as file:
-                dump(self.plugin_states, file, ensure_ascii=False, indent=2)
+    def _configured_plugins(self) -> list[dict]:
+        '''获取 pyproject.toml 中登记的插件配置。'''
+        from Scripts.Managers import environment_manager
 
-    def get_installed_plugins(self) -> list[dict]:
-        '''获取所有已安装插件信息'''
-        plugins = []
-        for plugin in nonebot.get_loaded_plugins():
-            metadata = plugin.metadata
-            name = plugin.name
-            enabled = self.plugin_states.get(name, True)
-            plugins.append({
-                'name': name,
-                'display_name': metadata.name if metadata else name,
-                'version': metadata.extra.get('version', '') if metadata else '',
-                'description': metadata.description if metadata else '',
-                'author': metadata.extra.get('author', '') if metadata else '',
-                'enabled': enabled,
-                'type': 'plugin',
-            })
-        return plugins
+        configured_plugins = []
+        for plugin in environment_manager.nonebot_config.get('plugins', []):
+            if isinstance(plugin, str):
+                configured_plugins.append({'module_name': plugin, 'enabled': True})
+            elif plugin.get('module_name'):
+                configured_plugins.append(plugin)
+        return configured_plugins
 
-    def get_plugin_detail(self, name: str) -> dict | None:
-        '''获取指定插件详情'''
-        plugin = nonebot.get_plugin(name)
-        if not plugin:
-            return None
-        metadata = plugin.metadata
-        enabled = self.plugin_states.get(name, True)
+    @staticmethod
+    def _can_disable(module_name: str) -> bool:
+        return (
+            module_name.startswith('Plugins.Commands.')
+            or module_name.startswith('Plugins.Expand.')
+            or not module_name.startswith('Plugins.')
+        )
+
+    @staticmethod
+    def _plugin_info(plugin, configured: dict | None = None) -> dict:
+        metadata = plugin.metadata if plugin else None
+        if plugin:
+            module_name = plugin.module_name
+        else:
+            assert configured is not None
+            module_name = configured['module_name']
+        extra = metadata.extra if metadata else {}
         return {
-            'name': name,
-            'display_name': metadata.name if metadata else name,
-            'version': metadata.extra.get('version', '') if metadata else '',
+            'name': plugin.name if plugin else module_name.rsplit('.', 1)[-1],
+            'module_name': module_name,
+            'display_name': metadata.name if metadata else module_name.rsplit('.', 1)[-1],
+            'version': extra.get('version', '') if metadata else '',
             'description': metadata.description if metadata else '',
-            'author': metadata.extra.get('author', '') if metadata else '',
+            'author': extra.get('author', '') if metadata else '',
             'homepage': metadata.homepage if metadata else '',
-            'enabled': enabled,
-            'type': 'plugin',
+            'enabled': configured.get('enabled', True) if configured else True,
+            'type': 'builtin' if module_name.startswith('Plugins.') else 'external',
+            'can_disable': PluginManager._can_disable(module_name),
             'dependencies': [],
             'config_schema': {},
         }
 
+    def get_installed_plugins(self) -> list[dict]:
+        '''获取登记插件和未登记依赖插件的详细信息。'''
+        loaded_plugins = {plugin.module_name: plugin for plugin in nonebot.get_loaded_plugins()}
+        plugins = []
+        configured_modules = set()
+        for configured in self._configured_plugins():
+            module_name = configured['module_name']
+            configured_modules.add(module_name)
+            plugins.append(self._plugin_info(loaded_plugins.get(module_name), configured))
+        for module_name, plugin in loaded_plugins.items():
+            if module_name not in configured_modules:
+                info = self._plugin_info(plugin)
+                info['type'] = 'dependency'
+                info['can_disable'] = False
+                plugins.append(info)
+        return plugins
+
+    def get_plugin_detail(self, name: str) -> dict | None:
+        '''获取指定插件详情'''
+        for plugin in self.get_installed_plugins():
+            if plugin['name'] == name or plugin['module_name'] == name:
+                return plugin
+        return None
+
     async def set_enabled(self, name: str, enabled: bool) -> bool:
-        '''设置插件启停状态'''
-        plugin = nonebot.get_plugin(name)
-        if not plugin:
+        '''设置可管理插件的启停状态，重启后生效。'''
+        plugin = self.get_plugin_detail(name)
+        if not plugin or not plugin['can_disable']:
             return False
-        self.plugin_states[name] = enabled
-        await self.save()
+        from Scripts.Managers import environment_manager
+
+        environment_manager.set_plugin_enabled(plugin['module_name'], enabled)
         return True
 
 

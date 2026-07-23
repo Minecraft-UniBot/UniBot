@@ -13,9 +13,6 @@ admin_superusers = true
 # 若你服务器没有假人或者你不想对玩家进行分类，留空即可。
 bot_prefix = ""
 
-# 启用的指令。send 指令仅在 sync_all_qq_message 为 false 时生效。
-command_enabled = ["list", "luck", "server", "help", "bound", "command", "send"]
-
 # 指令群，机器人只对这些群的指令作响应。
 # 格式 "{平台}:{群ID}"，平台对应：
 #   qq_client / qq_guild / qq_api / telegram / discord / dodo / kook / wechat / wecom / onebot12_other / satori_other

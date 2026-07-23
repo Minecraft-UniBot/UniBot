@@ -2,8 +2,9 @@ import asyncio
 from datetime import datetime
 
 from nonebot import on_notice, on_message, on_command
-from nonebot.params import ArgPlainText
 from nonebot.log import logger
+from nonebot.params import ArgPlainText
+from nonebot.plugin import PluginMetadata
 from nonebot.adapters.minecraft import PlayerChatEvent, PlayerJoinEvent, PlayerQuitEvent, PlayerDeathEvent
 from nonebot.adapters.minecraft.message import MessageSegment
 from nonebot.adapters.minecraft.models import HoverAction, HoverEvent, Component
@@ -17,6 +18,11 @@ from Scripts.Managers import server_manager
 from Scripts.Utils import check_message
 from Scripts.Rules import message_group_rule
 
+__plugin_meta__ = PluginMetadata(
+    name='消息互通事件',
+    description='处理玩家事件以及聊天平台与 Minecraft 服务器之间的消息同步。',
+    usage='由相关消息与服务器事件自动触发。',
+)
 
 notice_watcher = on_notice()
 message_watcher = on_message(rule=message_group_rule)

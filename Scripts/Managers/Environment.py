@@ -118,9 +118,13 @@ class EnvironmentManager:
         '''添加插件，返回是否成功（False 表示已存在）'''
         data = self.read_pyproject()
         plugins = data.setdefault('tool', {}).setdefault('nonebot', {}).setdefault('plugins', [])
-        if module_name in plugins:
+        if any(
+            plugin == module_name
+            or isinstance(plugin, dict) and plugin.get('module_name') == module_name
+            for plugin in plugins
+        ):
             return False
-        plugins.append(module_name)
+        plugins.append({'module_name': module_name, 'enabled': True})
         self.write_pyproject(data)
         return True
 
@@ -129,8 +133,29 @@ class EnvironmentManager:
         data = self.read_pyproject()
         plugins = data.get('tool', {}).get('nonebot', {}).get('plugins', [])
         data['tool']['nonebot']['plugins'] = [
-            plugin for plugin in plugins if plugin != module_name
+            plugin
+            for plugin in plugins
+            if not (
+                plugin == module_name
+                or isinstance(plugin, dict) and plugin.get('module_name') == module_name
+            )
         ]
+        self.write_pyproject(data)
+
+    def set_plugin_enabled(self, module_name: str, enabled: bool):
+        '''更新 pyproject.toml 中插件的启用状态。'''
+        data = self.read_pyproject()
+        plugins = data.get('tool', {}).get('nonebot', {}).get('plugins', [])
+        for index, plugin in enumerate(plugins):
+            if plugin == module_name:
+                plugins[index] = {'module_name': module_name, 'enabled': enabled}
+                break
+            if isinstance(plugin, dict) and plugin.get('module_name') == module_name:
+                plugin['enabled'] = enabled
+                break
+        else:
+            plugins.append({'module_name': module_name, 'enabled': enabled})
+        data['tool']['nonebot']['plugins'] = plugins
         self.write_pyproject(data)
 
 

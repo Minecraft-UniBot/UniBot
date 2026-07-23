@@ -1,4 +1,4 @@
-from nonebot.log import logger
+from nonebot.plugin import PluginMetadata
 
 from nonebot_plugin_uninfo import Uninfo
 from nonebot_plugin_alconna import Match, At, Command
@@ -10,7 +10,11 @@ from Scripts.Managers import data_manager, server_manager
 from Scripts.Utils import check_player, get_permission
 from Scripts.Rules import command_group_rule
 
-logger.debug('加载命令 Bound 完毕！')
+__plugin_meta__ = PluginMetadata(
+    name='玩家绑定',
+    description='管理聊天用户与 Minecraft 玩家及白名单的绑定关系。',
+    usage='.bound [玩家名|子命令]',
+)
 
 matcher = (
     Command('bound <player?#要绑定的玩家名:str>', '管理玩家白名单绑定。')

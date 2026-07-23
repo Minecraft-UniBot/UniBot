@@ -1,4 +1,4 @@
-from nonebot.log import logger
+from nonebot.plugin import PluginMetadata
 from nonebot_plugin_alconna import Command
 from nonebot_plugin_alconna.uniseg import Image, UniMessage
 
@@ -8,7 +8,11 @@ from Scripts.Managers import server_manager
 from Scripts.Utils import turn_message_text
 from Scripts.Rules import command_group_rule
 
-logger.debug('加载命令 Server 完毕！')
+__plugin_meta__ = PluginMetadata(
+    name='服务器列表',
+    description='展示当前与 UniBot 建立连接的 Minecraft 服务器。',
+    usage='.server',
+)
 
 matcher = (
     Command('server', '查看已连接的服务器列表。')

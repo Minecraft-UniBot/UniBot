@@ -40,7 +40,6 @@ class Config(BaseModel):
     bot_prefix: str = ''
     admin_superusers: bool = True
 
-    command_enabled: list[str] = []
     command_groups: list[str] = []
     message_groups: list[str] = []
 
@@ -75,10 +74,6 @@ class Config(BaseModel):
     @model_validator(mode='after')
     def normalize(self):
         self.bot_prefix = self.bot_prefix.upper() if self.bot_prefix else ''
-        if 'about' not in self.command_enabled:
-            self.command_enabled.append('about')
-        if self.sync_all_qq_message and 'send' in self.command_enabled:
-            self.command_enabled.remove('send')
         return self
 
 

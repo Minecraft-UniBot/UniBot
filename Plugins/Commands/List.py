@@ -1,4 +1,4 @@
-from nonebot.log import logger
+from nonebot.plugin import PluginMetadata
 
 from nonebot_plugin_alconna import Command, Match
 from nonebot_plugin_alconna.uniseg import Image, UniMessage
@@ -10,7 +10,11 @@ from Scripts.Network import get_player_uuid
 from Scripts.Utils import turn_message_text
 from Scripts.Rules import command_group_rule
 
-logger.debug('加载命令 List 完毕！')
+__plugin_meta__ = PluginMetadata(
+    name='在线玩家',
+    description='查询已连接服务器的在线玩家列表。',
+    usage='.list [服务器名称]',
+)
 
 matcher = (
     Command('list <server?#服务器名称:str>', '查看服务器在线玩家列表。')
