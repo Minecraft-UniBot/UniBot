@@ -1,3 +1,5 @@
+import asyncio
+
 from fastapi import APIRouter, Depends
 
 from nonebot.log import logger
@@ -24,17 +26,8 @@ def check_command_allowed(command: str) -> bool:
 async def get_servers(current_user: dict = Depends(get_current_user)):
     '''获取所有服务器状态'''
     servers = server_manager.servers or {}
-    server_list = []
-    for name in servers:
-        server_list.append({
-            'name': name,
-            'online': True,
-            'players': 0,
-            'max_players': 0,
-            'version': '',
-            'motd': '',
-            'latency_ms': 0,
-        })
+    statuses = await asyncio.gather(*(server_manager.get_status(server) for server in servers.values()))
+    server_list = [{'name': name, **status} for name, status in zip(servers, statuses)]
     return {'code': 0, 'data': server_list, 'message': 'ok'}
 
 
@@ -44,17 +37,20 @@ async def get_server_detail(name: str, current_user: dict = Depends(get_current_
     servers = server_manager.servers or {}
     if name not in servers:
         return {'code': 404, 'data': None, 'message': f'服务器 [{name}] 不存在'}
+    status, player_data = await asyncio.gather(
+        server_manager.get_status(servers[name]),
+        server_manager.get_player_list(servers[name]),
+    )
+    players, max_players = player_data
+    if not status['max_players']:
+        status['max_players'] = max_players
+    status['players'] = len(players)
     return {
         'code': 0,
         'data': {
             'name': name,
-            'online': True,
-            'players': 0,
-            'max_players': 0,
-            'version': '',
-            'motd': '',
-            'latency_ms': 0,
-            'player_list': [],
+            **status,
+            'player_list': players,
         },
         'message': 'ok',
     }
@@ -66,9 +62,10 @@ async def get_server_players(name: str, current_user: dict = Depends(get_current
     servers = server_manager.servers or {}
     if name not in servers:
         return {'code': 404, 'data': None, 'message': f'服务器 [{name}] 不存在'}
+    players, max_players = await server_manager.get_player_list(servers[name])
     return {
         'code': 0,
-        'data': {'server': name, 'players': [], 'count': 0, 'max_players': 0},
+        'data': {'server': name, 'players': players, 'count': len(players), 'max_players': max_players},
         'message': 'ok',
     }
 
@@ -100,6 +97,6 @@ async def broadcast_message(body: BroadcastRequest, current_user: dict = Depends
     '''广播消息到所有服务器'''
     if not body.message:
         return {'code': 1, 'data': None, 'message': '消息不能为空'}
-    await server_manager.send_message(body.message)
+    await server_manager.broadcast(body.message)
     logger.info(f'WebUI 广播消息：{body.message}')
     return {'code': 0, 'data': None, 'message': 'ok'}

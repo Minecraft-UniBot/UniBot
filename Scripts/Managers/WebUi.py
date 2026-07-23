@@ -41,7 +41,7 @@ class WebUiManager:
     async def ensure_downloaded(self) -> bool:
         '''确保 WebUI 静态资源已下载且版本匹配，否则重新下载'''
         if not self.version:
-            logger.warning('未配置 WebUI 版本（pyproject.toml [unibot] webui_version），跳过下载！')
+            logger.warning('未配置 WebUI 版本，跳过下载！')
             return False
         if self.is_ready():
             logger.info(f'WebUI 静态资源已就绪（{self.version}）。')
