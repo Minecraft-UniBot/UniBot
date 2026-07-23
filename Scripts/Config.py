@@ -36,7 +36,6 @@ class Config(BaseModel):
     command_start: list[str] = ['.']
 
     # 自定义配置（从 config.toml 读取）
-    token: str = ''
     bot_prefix: str = ''
     admin_superusers: bool = True
 

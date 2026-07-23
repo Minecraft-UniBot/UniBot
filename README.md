@@ -10,7 +10,7 @@
   <!-- <img src="https://img.shields.io/github/downloads/Minecraft-UniBot/UniBot/total" alt="下载量"> -->
 </p>
 
-<h1 align="center">🧊 Minecraft UniBot</h1>
+<h1 align="center">Minecraft UniBot</h1>
 
 <p align="center">
   <b>跨平台 · 多服互联 · 即插即用 — 让 Minecraft 与你的聊天世界无缝相连</b>
@@ -19,7 +19,7 @@
 <p align="center">
   <a href="https://qm.qq.com/q/B3kmvJl2xO">💬 加入 QQ 群</a>
   ·
-  <a href="https://github.com/Minecraft-UniBot/UniBot/issues">🐛 反馈问题</a>
+  <a href="https://github.com/MineJPGcraft/UniBot/issues">🐛 反馈问题</a>
 </p>
 
 ---
@@ -30,11 +30,11 @@
 |------|------|
 | **🌐 真正的跨平台** | 不止 QQ，还支持 Telegram、Discord、Kook、QQ 频道等，一套指令全平台通用 |
 | **🔗 多服互联** | 同时连接多台 Minecraft 服务器，消息互通，跨服聊天零延迟 |
-| **⚡ WebSocket 实时通信** | 基于 [nonebot-adapter-minecraft](https://github.com/17TheWord/nonebot-adapter-minecraft) 的 WebSocket 长连接，告别轮询，消息即时送达 |
-| **🧩 模块化架构** | 指令按插件拆分，Alconna 命令解析器驱动，扩展新功能就像搭积木 |
-| **🖥️ WebUI 管理面板** | 基于 Vue 3 构建的现代化管理界面，可视化配置、实时监控、日志查看，开箱即用 |
+| **🔄 全服务端兼容** | 支持 Fabric、Forge、Spigot、Paper 等主流服务端，即插即用，无需额外适配 |
+| **🧩 模块化架构** | 指令按插件拆分，扩展新功能就像搭积木 |
+| **🖥️ WebUI 管理面板** | 的现代化管理界面，可视化配置、实时监控、日志查看，开箱即用 |
 | **🤖 AI 智能对话** | 接入任意 OpenAI 兼容 API，@机器人即可与 AI 对话，支持上下文记忆 |
-| **🔐 白名单管理** | 完善的 QQ 与游戏 ID 绑定系统，支持多服白名单同步 |
+| **🔐 白名单管理** | 完善的平台账号与游戏 ID 绑定系统，支持多服白名单同步 |
 | **🎨 图片渲染模式** | 基于 HTML + CSS 模板引擎，将指令输出渲染为精美图片，支持自定义背景 |
 <!-- | **🐳 Docker 支持** | 一键部署，开箱即用 | -->
 
@@ -304,19 +304,6 @@ enabled = true
 - **🤖 AI 对话**：@机器人即可聊天，支持自定义 API 地址、模型和系统提示词，对话上下文自动管理
 - **🔑 关键词回复**：自定义关键词自动触发回复，无需编程
 
-### 灵活配置
-
-- 按需启停指令模块（`command_enabled`）
-- 自定义消息转发颜色（`sync_color_*`）
-- 敏感词过滤（`sync_sensitive_words`）
-- 兼容模式支持（`list_compatible_mode`）
-- 假人前缀分类（`bot_prefix`）
-- 指令黑白名单（`command_minecraft_whitelist` / `command_minecraft_blacklist`）
-- 绑定数量限制（`qq_bound_max_number`）
-- 服务器信息缓存策略（`server_memory_update_interval` / `server_memory_max_cache`）
-- API 接口开放（可选，`[api]`）
-- WebUI 管理面板（可选，`[webui]`）
-
 ---
 
 ## 🏗️ 架构设计
@@ -384,7 +371,6 @@ flowchart TB
 
     subgraph BOT["🤖 UniBot 核心"]
         CORE["NoneBot2\n事件驱动框架"]
-        OB["OneBot 适配器"]
         AC["Alconna\n跨平台命令解析"]
     end
 
@@ -398,22 +384,18 @@ flowchart TB
     S1 <-->|WebSocket| CORE
     S2 <-->|WebSocket| CORE
     S3 <-->|WebSocket| CORE
-    CORE --- OB
     CORE --- AC
-    OB <-->|OneBot 协议| QQ
-    AC <-->|Alconna 协议| TG
-    AC <-->|Alconna 协议| DC
-    AC <-->|Alconna 协议| KK
+    AC <-->|OneBot 协议| QQ
+    AC <-->|Telegram 适配器| TG
+    AC <-->|Discord 适配器| DC
+    AC <-->|Kook 适配器| KK
 
     style S1 fill:#4a9e6b,color:#fff
     style S2 fill:#4a9e6b,color:#fff
     style S3 fill:#4a9e6b,color:#fff
     style CORE fill:#7c3aed,color:#fff
-    style OB fill:#2563eb,color:#fff
     style AC fill:#2563eb,color:#fff
 ```
-
-> Minecraft 服务端需安装 [鹊桥（QueQiao）](https://github.com/17TheWord/MC_QQ_Spigot) 插件/模组来建立连接。
 
 ## 🧪 对比同类方案
 
@@ -449,10 +431,8 @@ flowchart TB
 - [nonebot-adapter-minecraft](https://github.com/17TheWord/nonebot-adapter-minecraft) — Minecraft 协议适配
 - [Alconna](https://github.com/ArcletProject/Alconna) — 强大的命令解析库
 - 感谢以下伙伴的贡献与支持：
-  - [Msg_Lbo](https://github.com/Msg-Lbo) — 网站服务器与域名支持
   - [meng877](https://github.com/meng877) — 意见与代码贡献
-  - [Decent_Kook](https://github.com/AISophon) — 测试环境与宣传
-  - [creepebucket](https://github.com/creepebucket) — 测试环境
+  - [Decent_Kook](https://github.com/AISophon) — 宣传
 
 ---
 
@@ -460,7 +440,7 @@ flowchart TB
 
 - [TQM 服务器](https://tqm.mc/)
 - [LemonFate 服务器](https://www.lemonfate.cn/)
-- [RedstoneDaily 红石日报](https://www.redstonedaily.com/)
+- [MCJPG](https://www.mcjpg.org)
 
 ---
 

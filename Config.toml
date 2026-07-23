@@ -3,9 +3,6 @@
 # 及适配器配置（ONEBOT_ACCESS_TOKEN、MINECRAFT_WS_URLS、MINECRAFT_ACCESS_TOKEN）仍在 .env 中配置。
 # 本文件使用 TOML 格式，嵌套表会自动展平为 Config 字段（如 [ai] 下的 enabled → ai_enabled）。
 
-# 密钥，用来防止别人连接到你的机器人，公网机器运行请务必设置。
-token = ""
-
 # 是否将所有的管理员视为超级用户。
 admin_superusers = true
 
@@ -65,13 +62,6 @@ sync_color_message = "gray"
 
 # 绑定 QQ 号的最大数量，设置 0 表示不限制。
 qq_bound_max_number = 1
-
-# 更新服务器信息的间隔时间，单位为分钟。
-server_memory_update_interval = 5
-
-# 服务器信息的缓存时间，为几个单位（前面的 server_memory_update_interval 为一个单位）。
-# 超过这个时间的服务器信息将会被删除。
-server_memory_max_cache = 200
 
 [webui]
 # 是否启用 WebUI 管理面板。
