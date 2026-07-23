@@ -1,19 +1,13 @@
-import re
 from datetime import datetime, timezone
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends
 
-from .Auth import get_current_user, require_role
+from .Auth import get_current_user
 
 router = APIRouter(prefix='/api/logs', tags=['Logs'])
 
 LOGS_DIR = Path('Logs').resolve()
-
-# 日志行解析正则：匹配 loguru 格式 "2026-07-20 12:00:01.123 | INFO     | module - message"
-LOG_LINE_PATTERN = re.compile(
-    r'^(?P<time>\d{2}:\d{2}:\d{2})\s*\|\s*(?P<level>\w+)\s*\|\s*(?P<message>.*)$'
-)
 
 
 @router.get('', summary='获取日志文件列表')
@@ -36,15 +30,17 @@ async def get_logs(current_user: dict = Depends(get_current_user)):
 @router.get('/{name}', summary='获取日志内容')
 async def get_log_content(
     name: str,
-    level: str = Query(''),
-    keyword: str = Query(''),
-    page: int = Query(1, ge=1),
-    page_size: int = Query(200, ge=1, le=1000),
     current_user: dict = Depends(get_current_user),
 ):
-    '''获取指定日志文件内容，支持按级别和关键词过滤'''
-    log_file = LOGS_DIR / name
-    if not log_file.exists() or not name.endswith('.log'):
+    '''获取指定日志文件原始内容，解析与过滤由前端完成'''
+    if not name.endswith('.log'):
+        return {'code': 404, 'data': None, 'message': '日志文件不存在'}
+    log_file = (LOGS_DIR / name).resolve()
+    try:
+        log_file.relative_to(LOGS_DIR)
+    except ValueError:
+        return {'code': 404, 'data': None, 'message': '日志文件不存在'}
+    if not log_file.exists() or not log_file.is_file():
         return {'code': 404, 'data': None, 'message': '日志文件不存在'}
 
     try:
@@ -52,47 +48,9 @@ async def get_log_content(
     except Exception as error:
         return {'code': 500, 'data': None, 'message': f'读取日志失败：{error}'}
 
-    raw_lines = content.splitlines()
-    parsed_items = []
+    lines = []
+    for index, line in enumerate(content.splitlines(), start=1):
+        lines.append({'line': index, 'text': line})
 
-    for index, line in enumerate(raw_lines, start=1):
-        match = LOG_LINE_PATTERN.match(line)
-        if match:
-            item = {
-                'line': index,
-                'time': match.group('time'),
-                'level': match.group('level'),
-                'message': match.group('message'),
-            }
-        else:
-            item = {'line': index, 'time': '', 'level': '', 'message': line}
-        parsed_items.append(item)
+    return {'code': 0, 'data': lines, 'message': 'ok'}
 
-    # 按级别过滤
-    if level:
-        level_upper = level.upper()
-        parsed_items = [item for item in parsed_items if item['level'] == level_upper]
-
-    # 按关键词过滤
-    if keyword:
-        parsed_items = [item for item in parsed_items if keyword in item['message']]
-
-    total = len(parsed_items)
-    start = (page - 1) * page_size
-    items = parsed_items[start:start + page_size]
-
-    return {
-        'code': 0,
-        'data': {'items': items, 'total': total, 'page': page, 'page_size': page_size},
-        'message': 'ok',
-    }
-
-
-@router.delete('/{name}', summary='删除日志文件')
-async def delete_log(name: str, current_user: dict = Depends(require_role('admin'))):
-    '''删除指定日志文件'''
-    log_file = (LOGS_DIR / name).resolve()
-    if not log_file.exists() or not name.endswith('.log') or not str(log_file).startswith(str(LOGS_DIR)):
-        return {'code': 404, 'data': None, 'message': '日志文件不存在'}
-    log_file.unlink()
-    return {'code': 0, 'data': None, 'message': 'ok'}
